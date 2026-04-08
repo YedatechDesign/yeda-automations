@@ -303,6 +303,78 @@ function ConfirmModal({ message, onConfirm, onCancel }: { message: string; onCon
 }
 
 /* ------------------------------------------------------------------ */
+/*  Credentials Block                                                  */
+/* ------------------------------------------------------------------ */
+const VIEWER_CODE = "yeda2026";
+const VIEWER_KEY = "yeda-automations-viewer";
+
+function CredentialsBlock({ login, password, isAdmin }: { login: string | null; password: string | null; isAdmin: boolean }) {
+  const [unlocked, setUnlocked] = useState(false);
+  const [code, setCode] = useState("");
+  const [showPrompt, setShowPrompt] = useState(false);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    if (isAdmin || sessionStorage.getItem(VIEWER_KEY) === "true") setUnlocked(true);
+  }, [isAdmin]);
+
+  const handleUnlock = () => {
+    if (code === VIEWER_CODE) {
+      setUnlocked(true);
+      sessionStorage.setItem(VIEWER_KEY, "true");
+      setShowPrompt(false);
+    } else {
+      setError(true);
+      setTimeout(() => setError(false), 1500);
+    }
+  };
+
+  if (!unlocked) {
+    return (
+      <div className="mb-4">
+        {showPrompt ? (
+          <div className="flex items-center gap-2">
+            <input type="password" value={code} onChange={(e) => setCode(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleUnlock()}
+              placeholder="Enter code" autoFocus
+              className={`px-2.5 py-1.5 rounded-md bg-input-bg border text-foreground text-xs outline-none w-32 ${error ? "border-red-500" : "border-border-hover focus:border-accent"}`} />
+            <button onClick={handleUnlock} className="text-xs px-2.5 py-1.5 rounded-md bg-accent text-white hover:bg-accent-hover transition-colors">OK</button>
+            <button onClick={() => setShowPrompt(false)} className="text-xs text-text-muted hover:text-text-secondary transition-colors">Cancel</button>
+          </div>
+        ) : (
+          <button onClick={() => setShowPrompt(true)}
+            className="text-xs px-3 py-1.5 rounded-lg bg-border/30 text-text-muted hover:text-text-secondary hover:bg-border/50 transition-colors flex items-center gap-1.5">
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0110 0v4" />
+            </svg>
+            Show credentials
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="mb-4 flex items-center gap-4 flex-wrap">
+      {login && (
+        <div className="flex items-center gap-1.5">
+          <span className="text-[10px] font-semibold text-text-muted uppercase tracking-widest">Login</span>
+          <span className="text-xs text-text-secondary bg-background px-2 py-1 rounded-md font-mono">{login}</span>
+          <CopyButton text={login} />
+        </div>
+      )}
+      {password && (
+        <div className="flex items-center gap-1.5">
+          <span className="text-[10px] font-semibold text-text-muted uppercase tracking-widest">Password</span>
+          <span className="text-xs text-text-secondary bg-background px-2 py-1 rounded-md font-mono">{password}</span>
+          <CopyButton text={password} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /*  Automation Card                                                    */
 /* ------------------------------------------------------------------ */
 function AutomationCard({ automation, index, isLoggedIn, onToggleCheck, onMarkDone, onSetProgress, onEdit, onDelete, onAddNote, onDeleteNote, onToggleNoteVis }: {
@@ -375,24 +447,9 @@ function AutomationCard({ automation, index, isLoggedIn, onToggleCheck, onMarkDo
           {deadlineInfo && <p className={`text-xs mb-3 sm:hidden ${deadlineInfo.cls}`}>{deadlineInfo.text}</p>}
           {automation.description && <p className="text-sm text-text-secondary mb-4 leading-relaxed whitespace-pre-wrap">{automation.description}</p>}
 
-          {/* Credentials (logged in only) */}
-          {isLoggedIn && (automation.login || automation.password) && (
-            <div className="mb-4 flex items-center gap-4 flex-wrap">
-              {automation.login && (
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-semibold text-text-muted uppercase tracking-widest">Login</span>
-                  <span className="text-xs text-text-secondary bg-background px-2 py-1 rounded-md font-mono">{automation.login}</span>
-                  <CopyButton text={automation.login} />
-                </div>
-              )}
-              {automation.password && (
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] font-semibold text-text-muted uppercase tracking-widest">Password</span>
-                  <span className="text-xs text-text-secondary bg-background px-2 py-1 rounded-md font-mono">{automation.password}</span>
-                  <CopyButton text={automation.password} />
-                </div>
-              )}
-            </div>
+          {/* Credentials */}
+          {(automation.login || automation.password) && (
+            <CredentialsBlock login={automation.login} password={automation.password} isAdmin={isLoggedIn} />
           )}
 
           {/* Inline progress control */}
