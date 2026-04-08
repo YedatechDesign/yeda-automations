@@ -55,6 +55,19 @@ function EyeOffIcon() {
 function XIcon() {
   return <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>;
 }
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button onClick={() => { navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 1500); }}
+      className="p-1 rounded-md text-text-muted hover:text-accent transition-colors" title="Copy">
+      {copied ? (
+        <svg className="w-3.5 h-3.5 text-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+      ) : (
+        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" /></svg>
+      )}
+    </button>
+  );
+}
 function SunIcon() {
   return <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><circle cx="12" cy="12" r="5" /><path strokeLinecap="round" d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" /></svg>;
 }
@@ -118,6 +131,8 @@ function AutomationModal({ automation, categories, onSave, onClose }: {
   const [newCategory, setNewCategory] = useState("");
   const [useNew, setUseNew] = useState(categories.length === 0);
   const [link, setLink] = useState(automation?.link ?? "");
+  const [login, setLogin] = useState(automation?.login ?? "");
+  const [pw, setPw] = useState(automation?.password ?? "");
   const [deadline, setDeadline] = useState(automation?.deadline ?? "");
   const [checklistText, setChecklistText] = useState(
     automation?.checklist.map((c) => (c.completed ? "[x] " : "[ ] ") + c.text).join("\n") ?? ""
@@ -138,7 +153,8 @@ function AutomationModal({ automation, categories, onSave, onClose }: {
     onSave({
       id: automation?.id ?? generateId(),
       title: title.trim(), description: description.trim(), status, urgency, category: cat,
-      link: link.trim() || null, deadline: deadline || null, manualProgress: useManualProgress ? manualProgress : null,
+      link: link.trim() || null, login: login.trim() || null, password: pw.trim() || null,
+      deadline: deadline || null, manualProgress: useManualProgress ? manualProgress : null,
       checklist, notes: automation?.notes ?? [],
       createdAt: automation?.createdAt ?? now, updatedAt: now,
     });
@@ -159,6 +175,17 @@ function AutomationModal({ automation, categories, onSave, onClose }: {
 
         <label className="block text-xs text-text-secondary mb-1 font-medium">Link</label>
         <input value={link} onChange={(e) => setLink(e.target.value)} className={`${ic} mb-3`} placeholder="https://..." />
+
+        <div className="grid grid-cols-2 gap-3 mb-3">
+          <div>
+            <label className="block text-xs text-text-secondary mb-1 font-medium">Login</label>
+            <input value={login} onChange={(e) => setLogin(e.target.value)} className={ic} placeholder="Username or email" />
+          </div>
+          <div>
+            <label className="block text-xs text-text-secondary mb-1 font-medium">Password</label>
+            <input value={pw} onChange={(e) => setPw(e.target.value)} className={ic} placeholder="Password" />
+          </div>
+        </div>
 
         <label className="block text-xs text-text-secondary mb-1 font-medium">Category</label>
         {categories.length > 0 && !useNew ? (
@@ -347,6 +374,26 @@ function AutomationCard({ automation, index, isLoggedIn, onToggleCheck, onMarkDo
         <div className="mt-4 pt-3 border-t border-border/50 ml-11 sm:ml-12">
           {deadlineInfo && <p className={`text-xs mb-3 sm:hidden ${deadlineInfo.cls}`}>{deadlineInfo.text}</p>}
           {automation.description && <p className="text-sm text-text-secondary mb-4 leading-relaxed whitespace-pre-wrap">{automation.description}</p>}
+
+          {/* Credentials (logged in only) */}
+          {isLoggedIn && (automation.login || automation.password) && (
+            <div className="mb-4 flex items-center gap-4 flex-wrap">
+              {automation.login && (
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] font-semibold text-text-muted uppercase tracking-widest">Login</span>
+                  <span className="text-xs text-text-secondary bg-background px-2 py-1 rounded-md font-mono">{automation.login}</span>
+                  <CopyButton text={automation.login} />
+                </div>
+              )}
+              {automation.password && (
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] font-semibold text-text-muted uppercase tracking-widest">Password</span>
+                  <span className="text-xs text-text-secondary bg-background px-2 py-1 rounded-md font-mono">{automation.password}</span>
+                  <CopyButton text={automation.password} />
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Inline progress control */}
           {isLoggedIn && (
