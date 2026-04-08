@@ -121,6 +121,8 @@ function AutomationModal({ automation, categories, onSave, onClose }: {
   const [checklistText, setChecklistText] = useState(
     automation?.checklist.map((c) => (c.completed ? "[x] " : "[ ] ") + c.text).join("\n") ?? ""
   );
+  const [useManualProgress, setUseManualProgress] = useState(automation?.manualProgress !== null && automation?.manualProgress !== undefined);
+  const [manualProgress, setManualProgress] = useState(automation?.manualProgress ?? 0);
 
   const handleSave = () => {
     if (!title.trim()) return;
@@ -135,7 +137,8 @@ function AutomationModal({ automation, categories, onSave, onClose }: {
     onSave({
       id: automation?.id ?? generateId(),
       title: title.trim(), description: description.trim(), status, urgency, category: cat,
-      deadline: deadline || null, checklist, notes: automation?.notes ?? [],
+      deadline: deadline || null, manualProgress: useManualProgress ? manualProgress : null,
+      checklist, notes: automation?.notes ?? [],
       createdAt: automation?.createdAt ?? now, updatedAt: now,
     });
   };
@@ -190,6 +193,22 @@ function AutomationModal({ automation, categories, onSave, onClose }: {
             <label className="block text-xs text-text-secondary mb-1 font-medium">Deadline</label>
             <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} className={ic} />
           </div>
+        </div>
+
+        <div className="mb-3">
+          <label className="flex items-center gap-2 text-xs text-text-secondary font-medium cursor-pointer select-none">
+            <input type="checkbox" checked={useManualProgress} onChange={(e) => setUseManualProgress(e.target.checked)} className="w-3.5 h-3.5" />
+            Set progress manually
+          </label>
+          {useManualProgress && (
+            <div className="flex items-center gap-3 mt-2">
+              <input type="range" min={0} max={100} value={manualProgress} onChange={(e) => setManualProgress(Number(e.target.value))}
+                className="flex-1 accent-accent h-1.5" />
+              <input type="number" min={0} max={100} value={manualProgress} onChange={(e) => setManualProgress(Math.min(100, Math.max(0, Number(e.target.value))))}
+                className={`${ic} w-16 text-center`} />
+              <span className="text-xs text-text-muted">%</span>
+            </div>
+          )}
         </div>
 
         <label className="block text-xs text-text-secondary mb-1 font-medium">
@@ -255,10 +274,11 @@ function ConfirmModal({ message, onConfirm, onCancel }: { message: string; onCon
 /* ------------------------------------------------------------------ */
 /*  Automation Card                                                    */
 /* ------------------------------------------------------------------ */
-function AutomationCard({ automation, index, isLoggedIn, onToggleCheck, onMarkDone, onEdit, onDelete, onAddNote, onDeleteNote, onToggleNoteVis }: {
+function AutomationCard({ automation, index, isLoggedIn, onToggleCheck, onMarkDone, onSetProgress, onEdit, onDelete, onAddNote, onDeleteNote, onToggleNoteVis }: {
   automation: Automation; index: number; isLoggedIn: boolean;
   onToggleCheck: (autoId: string, itemId: string) => void;
   onMarkDone: (id: string) => void;
+  onSetProgress: (id: string, progress: number | null) => void;
   onEdit: (a: Automation) => void; onDelete: (id: string) => void;
   onAddNote: (id: string) => void; onDeleteNote: (autoId: string, noteId: string) => void;
   onToggleNoteVis: (autoId: string, noteId: string) => void;
@@ -315,6 +335,17 @@ function AutomationCard({ automation, index, isLoggedIn, onToggleCheck, onMarkDo
         <div className="mt-4 pt-3 border-t border-border/50 ml-11 sm:ml-12">
           {deadlineInfo && <p className={`text-xs mb-3 sm:hidden ${deadlineInfo.cls}`}>{deadlineInfo.text}</p>}
           {automation.description && <p className="text-sm text-text-secondary mb-4 leading-relaxed whitespace-pre-wrap">{automation.description}</p>}
+
+          {/* Inline progress control */}
+          {isLoggedIn && (
+            <div className="mb-4 flex items-center gap-3">
+              <span className="text-[10px] font-semibold text-text-muted uppercase tracking-widest shrink-0">Progress</span>
+              <input type="range" min={0} max={100} value={progress}
+                onChange={(e) => onSetProgress(automation.id, Number(e.target.value))}
+                className="flex-1 accent-accent h-1.5 cursor-pointer" />
+              <span className="text-xs text-text-secondary font-semibold w-8 text-right">{progress}%</span>
+            </div>
+          )}
 
           {automation.checklist.length > 0 && (
             <div className="mb-4">
@@ -422,11 +453,20 @@ export default function AutomationsRoadmap() {
     setDeleteTarget(null);
   };
 
+  const handleSetProgress = (id: string, progress: number | null) => {
+    update((prev) => ({
+      ...prev,
+      automations: prev.automations.map((a) =>
+        a.id === id ? { ...a, manualProgress: progress, updatedAt: new Date().toISOString() } : a
+      ),
+    }));
+  };
+
   const handleMarkDone = (id: string) => {
     update((prev) => ({
       ...prev,
       automations: prev.automations.map((a) =>
-        a.id === id ? { ...a, status: "done" as const, checklist: a.checklist.map((c) => ({ ...c, completed: true })), updatedAt: new Date().toISOString() } : a
+        a.id === id ? { ...a, status: "done" as const, manualProgress: 100, checklist: a.checklist.map((c) => ({ ...c, completed: true })), updatedAt: new Date().toISOString() } : a
       ),
     }));
   };
@@ -584,7 +624,7 @@ export default function AutomationsRoadmap() {
               <div className="bg-card border border-border rounded-2xl p-2 sm:p-3 space-y-1">
                 {autos.map((a) => { idx++; return (
                   <AutomationCard key={a.id} automation={a} index={idx} isLoggedIn={loggedIn}
-                    onToggleCheck={handleToggleCheck} onMarkDone={handleMarkDone}
+                    onToggleCheck={handleToggleCheck} onMarkDone={handleMarkDone} onSetProgress={handleSetProgress}
                     onEdit={(a) => { setEditingAuto(a); setShowAutoModal(true); }}
                     onDelete={(id) => setDeleteTarget(id)} onAddNote={(id) => setNoteTarget(id)}
                     onDeleteNote={handleDeleteNote} onToggleNoteVis={handleToggleNoteVis} />

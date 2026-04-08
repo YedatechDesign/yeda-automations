@@ -21,6 +21,7 @@ export interface Automation {
   urgency: Urgency;
   category: string;
   deadline: string | null;
+  manualProgress: number | null;
   checklist: ChecklistItem[];
   notes: AutomationNote[];
   createdAt: string;
@@ -37,6 +38,7 @@ export function generateId(): string {
 }
 
 export function getProgress(a: Automation): number {
+  if (a.manualProgress !== null && a.manualProgress !== undefined) return a.manualProgress;
   if (a.checklist.length === 0) return a.status === "done" ? 100 : 0;
   return Math.round(
     (a.checklist.filter((c) => c.completed).length / a.checklist.length) * 100
@@ -59,6 +61,7 @@ export const INITIAL_DATA: AutomationsData = {
       urgency: "high",
       category: "Platforms",
       deadline: null,
+      manualProgress: null,
       checklist: [
         { id: "lms-1", text: "Fix pagination component", completed: false },
         { id: "lms-2", text: "Verify which statistics are displayed correctly", completed: false },
@@ -78,6 +81,7 @@ export const INITIAL_DATA: AutomationsData = {
       urgency: "medium",
       category: "Platforms",
       deadline: null,
+      manualProgress: null,
       checklist: [
         { id: "hw-1", text: "Audit current homework platform features and data", completed: false },
         { id: "hw-2", text: "Design migration plan for data and workflows", completed: false },
@@ -98,6 +102,7 @@ export const INITIAL_DATA: AutomationsData = {
       urgency: "medium",
       category: "Platforms",
       deadline: null,
+      manualProgress: null,
       checklist: [
         { id: "sp-1", text: "Finish and polish design across all pages", completed: false },
         { id: "sp-2", text: "Review and update all automation descriptions", completed: false },
@@ -117,6 +122,7 @@ export const INITIAL_DATA: AutomationsData = {
       urgency: "high",
       category: "Integrations",
       deadline: null,
+      manualProgress: null,
       checklist: [
         { id: "tb-1", text: "Add required fields in TargetBob", completed: true },
         { id: "tb-2", text: "Build LeadManager integration to receive data", completed: false },
