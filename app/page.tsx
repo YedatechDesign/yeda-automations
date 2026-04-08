@@ -338,12 +338,23 @@ function AutomationCard({ automation, index, isLoggedIn, onToggleCheck, onMarkDo
 
           {/* Inline progress control */}
           {isLoggedIn && (
-            <div className="mb-4 flex items-center gap-3">
-              <span className="text-[10px] font-semibold text-text-muted uppercase tracking-widest shrink-0">Progress</span>
-              <input type="range" min={0} max={100} value={progress}
-                onChange={(e) => onSetProgress(automation.id, Number(e.target.value))}
-                className="flex-1 accent-accent h-1.5 cursor-pointer" />
-              <span className="text-xs text-text-secondary font-semibold w-8 text-right">{progress}%</span>
+            <div className="mb-4">
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] font-semibold text-text-muted uppercase tracking-widest shrink-0">Progress</span>
+                <input type="range" min={0} max={100} value={progress}
+                  onChange={(e) => onSetProgress(automation.id, Number(e.target.value))}
+                  className="flex-1 accent-accent h-1.5 cursor-pointer" />
+                <input type="number" min={0} max={100} value={progress}
+                  onChange={(e) => onSetProgress(automation.id, Math.min(100, Math.max(0, Number(e.target.value) || 0)))}
+                  className="w-14 px-2 py-1 rounded-md bg-input-bg border border-border-hover text-foreground text-xs text-center outline-none focus:border-accent" />
+                <span className="text-xs text-text-muted">%</span>
+              </div>
+              {automation.manualProgress !== null && automation.manualProgress !== undefined && (
+                <button onClick={() => onSetProgress(automation.id, null)}
+                  className="text-[10px] text-text-muted hover:text-text-secondary mt-1 transition-colors">
+                  Reset to auto (from checklist)
+                </button>
+              )}
             </div>
           )}
 
