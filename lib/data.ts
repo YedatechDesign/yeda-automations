@@ -179,8 +179,13 @@ export const PASSWORD = "067270";
 
 export async function fetchServerData(): Promise<AutomationsData> {
   try {
-    const res = await fetch("/api/data", { cache: "no-store" });
-    if (res.ok) return await res.json();
+    const res = await fetch(`/api/data?t=${Date.now()}`, { cache: "no-store" });
+    if (res.ok) {
+      const serverData = await res.json();
+      // Always prefer server data — save to localStorage for offline fallback
+      saveData(serverData);
+      return serverData;
+    }
   } catch {
     // fallback to localStorage
   }
