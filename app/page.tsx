@@ -314,7 +314,7 @@ function AutomationCard({ automation, index, isLoggedIn, onToggleCheck, onMarkDo
           <div className="flex items-center gap-3 mt-1">
             {automation.checklist.length > 0 && <span className="text-[11px] sm:text-xs text-text-muted">{doneCount}/{automation.checklist.length} tasks</span>}
             <span className="text-[11px] sm:text-xs text-text-muted font-semibold">{progress}%</span>
-            {deadlineInfo && <span className={`text-[10px] sm:text-xs hidden sm:inline ${deadlineInfo.cls}`}>{deadlineInfo.text}</span>}
+            {deadlineInfo && <span className={`text-[10px] sm:text-xs ${deadlineInfo.cls}`}>{deadlineInfo.text}</span>}
           </div>
           <div className="mt-2 h-1.5 rounded-full bg-border/50 overflow-hidden">
             <div className={`h-full rounded-full bg-gradient-to-r ${cfg.bar} transition-all duration-700`} style={{ width: `${progress}%` }} />
