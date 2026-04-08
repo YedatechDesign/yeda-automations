@@ -12,8 +12,8 @@ import {
   INITIAL_DATA,
   generateId,
   getProgress,
-  loadData,
-  saveData,
+  fetchServerData,
+  saveDataWithSync,
   checkAuth,
   setAuth,
   loadTheme,
@@ -432,13 +432,16 @@ export default function AutomationsRoadmap() {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    setData(loadData());
     setLoggedIn(checkAuth());
     setTheme(loadTheme());
-    setLoaded(true);
+    // Load from server first, fallback to localStorage
+    fetchServerData().then((d) => {
+      setData(d);
+      setLoaded(true);
+    });
   }, []);
 
-  useEffect(() => { if (loaded) saveData(data); }, [data, loaded]);
+  useEffect(() => { if (loaded) saveDataWithSync(data, loggedIn); }, [data, loaded, loggedIn]);
   useEffect(() => {
     document.documentElement.className = theme === "dark" ? "theme-dark h-full antialiased" : "theme-light h-full antialiased";
     if (loaded) saveTheme(theme);

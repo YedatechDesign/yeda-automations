@@ -177,6 +177,32 @@ export function saveTheme(t: "dark" | "light") {
 
 export const PASSWORD = "067270";
 
+export async function fetchServerData(): Promise<AutomationsData> {
+  try {
+    const res = await fetch("/api/data", { cache: "no-store" });
+    if (res.ok) return await res.json();
+  } catch {
+    // fallback to localStorage
+  }
+  return loadData();
+}
+
+let saveTimer: ReturnType<typeof setTimeout> | null = null;
+
+export function saveDataWithSync(data: AutomationsData, isLoggedIn: boolean) {
+  saveData(data);
+  if (!isLoggedIn) return;
+  // Debounce server saves to avoid spamming during slider drags
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    fetch("/api/data", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-auth": PASSWORD },
+      body: JSON.stringify(data),
+    }).catch(() => {});
+  }, 500);
+}
+
 export const URGENCY_ORDER: Record<Urgency, number> = {
   critical: 0,
   high: 1,
