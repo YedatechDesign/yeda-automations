@@ -623,7 +623,8 @@ export default function AutomationsRoadmap() {
           </div>
         )}
 
-        {Array.from(grouped.entries()).map(([cat, autos]) => {
+        {/* Default: grouped by category */}
+        {sortMode === "default" && Array.from(grouped.entries()).map(([cat, autos]) => {
           const catDone = autos.filter((a) => a.status === "done").length;
           const catProg = Math.round(autos.reduce((s, a) => s + getProgress(a), 0) / autos.length);
           return (
@@ -644,6 +645,19 @@ export default function AutomationsRoadmap() {
             </section>
           );
         })}
+
+        {/* Urgency/Deadline: flat list, no category grouping */}
+        {sortMode !== "default" && sortedAutomations.length > 0 && (
+          <div className="bg-card border border-border rounded-2xl p-2 sm:p-3 space-y-1">
+            {sortedAutomations.map((a) => { idx++; return (
+              <AutomationCard key={a.id} automation={a} index={idx} isLoggedIn={loggedIn}
+                onToggleCheck={handleToggleCheck} onMarkDone={handleMarkDone} onSetProgress={handleSetProgress}
+                onEdit={(a) => { setEditingAuto(a); setShowAutoModal(true); }}
+                onDelete={(id) => setDeleteTarget(id)} onAddNote={(id) => setNoteTarget(id)}
+                onDeleteNote={handleDeleteNote} onToggleNoteVis={handleToggleNoteVis} />
+            ); })}
+          </div>
+        )}
       </main>
 
       {showLogin && <LoginModal onLogin={doLogin} onClose={() => setShowLogin(false)} />}
