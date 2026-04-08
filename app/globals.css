@@ -20,23 +20,8 @@
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* Dark theme */
-.theme-dark {
-  --bg: #0d1117;
-  --fg: #e6edf3;
-  --card: #161b22;
-  --card-hover: #1c2230;
-  --b: #21262d;
-  --b-hover: #30363d;
-  --input: #0d1117;
-  --muted: #484f58;
-  --text-sec: #8b949e;
-  --text-mut: #484f58;
-  --heading: #ffffff;
-}
-
 /* Light theme (default) */
-:root, .theme-light {
+:root {
   --bg: #f6f8fa;
   --fg: #1f2328;
   --card: #ffffff;
@@ -48,6 +33,21 @@
   --text-sec: #59636e;
   --text-mut: #8b949e;
   --heading: #1f2328;
+}
+
+/* Dark theme */
+:root.theme-dark {
+  --bg: #0d1117;
+  --fg: #e6edf3;
+  --card: #161b22;
+  --card-hover: #1c2230;
+  --b: #21262d;
+  --b-hover: #30363d;
+  --input: #0d1117;
+  --muted: #484f58;
+  --text-sec: #8b949e;
+  --text-mut: #484f58;
+  --heading: #ffffff;
 }
 
 * { box-sizing: border-box; }
