@@ -427,7 +427,7 @@ export default function AutomationsRoadmap() {
   const [editingAuto, setEditingAuto] = useState<Automation | null>(null);
   const [noteTarget, setNoteTarget] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [theme, setTheme] = useState<"dark" | "light">("light");
   const [sortMode, setSortMode] = useState<SortMode>("default");
   const [loaded, setLoaded] = useState(false);
 

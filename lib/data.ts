@@ -166,8 +166,8 @@ export function setAuth(v: boolean) {
 }
 
 export function loadTheme(): "dark" | "light" {
-  if (typeof window === "undefined") return "dark";
-  return (localStorage.getItem(THEME_KEY) as "dark" | "light") || "dark";
+  if (typeof window === "undefined") return "light";
+  return (localStorage.getItem(THEME_KEY) as "dark" | "light") || "light";
 }
 
 export function saveTheme(t: "dark" | "light") {
