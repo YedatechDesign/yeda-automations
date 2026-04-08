@@ -526,13 +526,22 @@ export default function AutomationsRoadmap() {
     const arr = [...data.automations];
     if (sortMode === "urgency") {
       arr.sort((a, b) => {
+        // Done items always go to the bottom
+        if (a.status === "done" && b.status !== "done") return 1;
+        if (a.status !== "done" && b.status === "done") return -1;
+        // Then sort by urgency (critical first)
+        const urgDiff = URGENCY_ORDER[a.urgency] - URGENCY_ORDER[b.urgency];
+        if (urgDiff !== 0) return urgDiff;
+        // Then by status (in-progress before not-started)
         const statusOrder = { "in-progress": 0, "not-started": 1, done: 2 };
-        const sd = statusOrder[a.status] - statusOrder[b.status];
-        if (sd !== 0) return sd;
-        return URGENCY_ORDER[a.urgency] - URGENCY_ORDER[b.urgency];
+        return statusOrder[a.status] - statusOrder[b.status];
       });
     } else if (sortMode === "deadline") {
       arr.sort((a, b) => {
+        // Done items go to the bottom
+        if (a.status === "done" && b.status !== "done") return 1;
+        if (a.status !== "done" && b.status === "done") return -1;
+        // Items with deadlines first, sorted by closest deadline
         if (!a.deadline && !b.deadline) return 0;
         if (!a.deadline) return 1;
         if (!b.deadline) return -1;

@@ -1,4 +1,4 @@
-import { put, head } from "@vercel/blob";
+import { put, list } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { INITIAL_DATA } from "@/lib/data";
 
@@ -7,14 +7,14 @@ const PASSWORD = "067270";
 
 export async function GET() {
   try {
-    const blob = await head(BLOB_PATH);
-    if (blob) {
-      const res = await fetch(blob.url);
+    const { blobs } = await list({ prefix: BLOB_PATH });
+    if (blobs.length > 0) {
+      const res = await fetch(blobs[0].url, { cache: "no-store" });
       const data = await res.json();
       return NextResponse.json(data);
     }
   } catch {
-    // blob doesn't exist yet — return initial data
+    // blob doesn't exist yet
   }
   return NextResponse.json(INITIAL_DATA);
 }
@@ -30,6 +30,7 @@ export async function POST(request: Request) {
     await put(BLOB_PATH, JSON.stringify(data), {
       access: "public",
       addRandomSuffix: false,
+      allowOverwrite: true,
     });
     return NextResponse.json({ ok: true });
   } catch (err) {
