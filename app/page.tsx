@@ -117,6 +117,7 @@ function AutomationModal({ automation, categories, onSave, onClose }: {
   const [category, setCategory] = useState(automation?.category ?? categories[0] ?? "");
   const [newCategory, setNewCategory] = useState("");
   const [useNew, setUseNew] = useState(categories.length === 0);
+  const [link, setLink] = useState(automation?.link ?? "");
   const [deadline, setDeadline] = useState(automation?.deadline ?? "");
   const [checklistText, setChecklistText] = useState(
     automation?.checklist.map((c) => (c.completed ? "[x] " : "[ ] ") + c.text).join("\n") ?? ""
@@ -137,7 +138,7 @@ function AutomationModal({ automation, categories, onSave, onClose }: {
     onSave({
       id: automation?.id ?? generateId(),
       title: title.trim(), description: description.trim(), status, urgency, category: cat,
-      deadline: deadline || null, manualProgress: useManualProgress ? manualProgress : null,
+      link: link.trim() || null, deadline: deadline || null, manualProgress: useManualProgress ? manualProgress : null,
       checklist, notes: automation?.notes ?? [],
       createdAt: automation?.createdAt ?? now, updatedAt: now,
     });
@@ -155,6 +156,9 @@ function AutomationModal({ automation, categories, onSave, onClose }: {
 
         <label className="block text-xs text-text-secondary mb-1 font-medium">Description</label>
         <textarea value={description} onChange={(e) => setDescription(e.target.value)} className={`${ic} mb-3 min-h-[70px] resize-y`} placeholder="What does this automation do?" />
+
+        <label className="block text-xs text-text-secondary mb-1 font-medium">Link</label>
+        <input value={link} onChange={(e) => setLink(e.target.value)} className={`${ic} mb-3`} placeholder="https://..." />
 
         <label className="block text-xs text-text-secondary mb-1 font-medium">Category</label>
         {categories.length > 0 && !useNew ? (
@@ -308,6 +312,14 @@ function AutomationCard({ automation, index, isLoggedIn, onToggleCheck, onMarkDo
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap">
             <span className="font-semibold text-heading text-sm sm:text-[15px] truncate max-w-[180px] sm:max-w-none">{automation.title}</span>
+            {automation.link && (
+              <a href={automation.link} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}
+                className="text-accent hover:text-accent-hover transition-colors shrink-0" title={automation.link}>
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+            )}
             <span className={`text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-medium ${cfg.badge} whitespace-nowrap`}>{cfg.label}</span>
             <span className={`text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-medium ${urg.cls} whitespace-nowrap`}>{urg.label}</span>
           </div>

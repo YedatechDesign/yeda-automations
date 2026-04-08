@@ -20,6 +20,7 @@ export interface Automation {
   status: "not-started" | "in-progress" | "done";
   urgency: Urgency;
   category: string;
+  link: string | null;
   deadline: string | null;
   manualProgress: number | null;
   checklist: ChecklistItem[];
@@ -60,6 +61,7 @@ export const INITIAL_DATA: AutomationsData = {
       status: "in-progress",
       urgency: "high",
       category: "Platforms",
+      link: "https://automations.yedalms.io/login",
       deadline: null,
       manualProgress: null,
       checklist: [
@@ -80,6 +82,7 @@ export const INITIAL_DATA: AutomationsData = {
       status: "in-progress",
       urgency: "medium",
       category: "Platforms",
+      link: "https://yedauto.com/webhook/login",
       deadline: null,
       manualProgress: null,
       checklist: [
@@ -101,6 +104,7 @@ export const INITIAL_DATA: AutomationsData = {
       status: "in-progress",
       urgency: "medium",
       category: "Platforms",
+      link: "https://yedatechdesign.github.io/yedauto/",
       deadline: null,
       manualProgress: null,
       checklist: [
@@ -121,6 +125,7 @@ export const INITIAL_DATA: AutomationsData = {
       status: "not-started",
       urgency: "high",
       category: "Integrations",
+      link: null,
       deadline: null,
       manualProgress: null,
       checklist: [
