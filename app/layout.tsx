@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Yeda — Automations Roadmap",
-  description: "Track automation projects and progress",
+  title: "Yeda — Список задач",
+  description: "Список задач та їх статус",
 };
 
 export default function RootLayout({

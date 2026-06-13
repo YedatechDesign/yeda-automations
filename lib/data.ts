@@ -1,159 +1,210 @@
-export interface ChecklistItem {
-  id: string;
-  text: string;
-  completed: boolean;
-}
+/* ------------------------------------------------------------------ */
+/*  Types                                                              */
+/* ------------------------------------------------------------------ */
+export type Status = "new" | "in-progress" | "waiting" | "done";
+export type Urgency = "critical" | "high" | "medium" | "low";
+export type Role = "viewer" | "alexey" | "kateryna";
 
-export interface AutomationNote {
+export interface TaskNote {
   id: string;
   text: string;
-  isPublic: boolean;
+  author: Role; // who wrote it ("alexey" | "kateryna")
   createdAt: string;
 }
 
-export type Urgency = "critical" | "high" | "medium" | "low";
-
-export interface Automation {
+export interface TaskLink {
   id: string;
+  label: string;
+  url: string;
+}
+
+export interface Task {
+  id: string;
+  emoji: string; // leading emoji — every title starts with one
   title: string;
   description: string;
-  status: "not-started" | "in-progress" | "done";
+  status: Status;
   urgency: Urgency;
-  category: string;
-  link: string | null;
-  login: string | null;
-  password: string | null;
-  deadline: string | null;
-  manualProgress: number | null;
-  checklist: ChecklistItem[];
-  notes: AutomationNote[];
+  color: string | null; // custom accent color (hex) or null for default
+  progress: number; // 0-100, set manually with the slider
+  links: TaskLink[];
+  waitingPerson: string; // who we are waiting on ("" if none)
+  waitingWhat: string; // what they need to do ("" if none)
+  notes: TaskNote[];
   createdAt: string;
   updatedAt: string;
 }
 
-export interface AutomationsData {
-  categories: string[];
-  automations: Automation[];
+export interface TasksData {
+  // display order === array order; reordering mutates the array
+  tasks: Task[];
 }
 
+/* ------------------------------------------------------------------ */
+/*  Helpers                                                            */
+/* ------------------------------------------------------------------ */
 export function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
-export function getProgress(a: Automation): number {
-  if (a.manualProgress !== null && a.manualProgress !== undefined) return a.manualProgress;
-  if (a.checklist.length === 0) return a.status === "done" ? 100 : 0;
-  return Math.round(
-    (a.checklist.filter((c) => c.completed).length / a.checklist.length) * 100
-  );
-}
+export const URGENCY_ORDER: Record<Urgency, number> = {
+  critical: 0,
+  high: 1,
+  medium: 2,
+  low: 3,
+};
 
-const STORAGE_KEY = "yeda-automations-data-v2";
-const AUTH_KEY = "yeda-automations-auth";
-const THEME_KEY = "yeda-automations-theme";
+/* ------------------------------------------------------------------ */
+/*  Initial data — REPLACE the tasks below with the real task list    */
+/* ------------------------------------------------------------------ */
+const T = "2026-06-13T09:00:00.000Z";
 
-export const INITIAL_DATA: AutomationsData = {
-  categories: ["Platforms", "Integrations"],
-  automations: [
+export const INITIAL_DATA: TasksData = {
+  tasks: [
     {
-      id: "auto-lms-dashboard",
-      title: "LMS Statistics Dashboard",
-      description:
-        "Dashboard with real-time statistics from the LMS. The platform is built and deployed at automations.yedalms.io. Need to fix pagination, verify displayed statistics, review Excel export data, and test on the Yeda Website test college to confirm data updates correctly in real time.",
-      status: "in-progress",
-      urgency: "high",
-      category: "Platforms",
-      link: "https://automations.yedalms.io/login",
-      login: null,
-      password: null,
-      deadline: null,
-      manualProgress: null,
-      checklist: [
-        { id: "lms-1", text: "Fix pagination component", completed: false },
-        { id: "lms-2", text: "Verify which statistics are displayed correctly", completed: false },
-        { id: "lms-3", text: "Review data shown when Excel is downloaded", completed: false },
-        { id: "lms-4", text: "Test on Yeda Website test college — confirm real-time data updates", completed: false },
-      ],
-      notes: [],
-      createdAt: "2026-04-08T10:00:00.000Z",
-      updatedAt: "2026-04-08T10:00:00.000Z",
+      id: "dscope", emoji: "🌐", title: "Dscope",
+      description: "- Routes / titles / sitemap (Alon sent instructions)\n- Case studies\n- Dashboard with statistics from all agents on the clients' sites",
+      status: "in-progress", urgency: "medium", color: null, progress: 30,
+      links: [], waitingPerson: "", waitingWhat: "",
+      notes: [], createdAt: T, updatedAt: T,
     },
     {
-      id: "auto-homework",
-      title: "Homework Platform Migration",
-      description:
-        "Existing homework platform at yedauto.com/webhook needs to be migrated to the new college automations platform. The homework system is functional but needs to be integrated into the unified automation suite.",
-      status: "in-progress",
-      urgency: "medium",
-      category: "Platforms",
-      link: "https://yedauto.com/webhook/login",
-      login: null,
-      password: null,
-      deadline: null,
-      manualProgress: null,
-      checklist: [
-        { id: "hw-1", text: "Audit current homework platform features and data", completed: false },
-        { id: "hw-2", text: "Design migration plan for data and workflows", completed: false },
-        { id: "hw-3", text: "Migrate homework functionality to new platform", completed: false },
-        { id: "hw-4", text: "Test migrated features end-to-end", completed: false },
-        { id: "hw-5", text: "Switch over and deprecate old platform", completed: false },
-      ],
-      notes: [],
-      createdAt: "2026-04-08T10:01:00.000Z",
-      updatedAt: "2026-04-08T10:01:00.000Z",
+      id: "callcenter", emoji: "📞", title: "Call Center",
+      description: "Twilio - check that the personal account information is approved, then buy the numbers.",
+      status: "new", urgency: "medium", color: null, progress: 10,
+      links: [], waitingPerson: "", waitingWhat: "",
+      notes: [], createdAt: T, updatedAt: T,
     },
     {
-      id: "auto-sales-platform",
-      title: "Automations Sales Platform",
-      description:
-        "Standalone platform to sell automations — currently at yedatechdesign.github.io/yedauto. Need to finish the design, review all automation listings, add a chatbot, and connect a custom domain.",
-      status: "in-progress",
-      urgency: "medium",
-      category: "Platforms",
-      link: "https://yedatechdesign.github.io/yedauto/",
-      login: null,
-      password: null,
-      deadline: null,
-      manualProgress: null,
-      checklist: [
-        { id: "sp-1", text: "Finish and polish design across all pages", completed: false },
-        { id: "sp-2", text: "Review and update all automation descriptions", completed: false },
-        { id: "sp-3", text: "Add chatbot integration", completed: false },
-        { id: "sp-4", text: "Connect custom domain", completed: false },
-      ],
-      notes: [],
-      createdAt: "2026-04-08T10:02:00.000Z",
-      updatedAt: "2026-04-08T10:02:00.000Z",
+      id: "abutable", emoji: "💳", title: "Abu Table (Seva)",
+      description: "Create a payment page, redirect to the Yeda course site, and after payment grant the student access through the YedaLMS API.\n\nThe page is ready; the connection to the YedaLMS API is not done yet.\nThe bit is still not available after signing the contract with Tranzila - on 14.06 the bot is supposed to appear on the page.",
+      status: "in-progress", urgency: "high", color: null, progress: 70,
+      links: [{ id: "l-abu", label: "course.abutable.com", url: "https://course.abutable.com" }],
+      waitingPerson: "Tranzila", waitingWhat: "the bit to become available; bot expected on the page on 14.06",
+      notes: [], createdAt: T, updatedAt: T,
     },
     {
-      id: "auto-targetbob",
-      title: "TargetBob — Chat & Call Summaries",
-      description:
-        "Send short summaries of chats and calls from TargetBob to Alexia via LeadManager. So far only the required fields have been added in TargetBob itself — the rest of the integration is not done yet.",
-      status: "not-started",
-      urgency: "high",
-      category: "Integrations",
-      link: null,
-      login: null,
-      password: null,
-      deadline: null,
-      manualProgress: null,
-      checklist: [
-        { id: "tb-1", text: "Add required fields in TargetBob", completed: true },
-        { id: "tb-2", text: "Build LeadManager integration to receive data", completed: false },
-        { id: "tb-3", text: "Create summary generation logic for chats", completed: false },
-        { id: "tb-4", text: "Create summary generation logic for calls", completed: false },
-        { id: "tb-5", text: "Send summaries to Alexia via LeadManager", completed: false },
-        { id: "tb-6", text: "Test full flow end-to-end", completed: false },
-      ],
-      notes: [],
-      createdAt: "2026-04-08T10:03:00.000Z",
-      updatedAt: "2026-04-08T10:03:00.000Z",
+      id: "orin", emoji: "🤖", title: "Orin Shpalter (Seva)",
+      description: "Create an agent that guides workers on how to use Rivhit and Oketz.\nAlready created and sent to Seva.",
+      status: "waiting", urgency: "medium", color: null, progress: 90,
+      links: [{ id: "l-orin", label: "Demo agent", url: "https://app.targetbob.ai/public/demo/c36de657-d4df-44ac-bc2c-bbfd10507d90" }],
+      waitingPerson: "Seva", waitingWhat: "feedback - whether anything needs to be changed",
+      notes: [], createdAt: T, updatedAt: T,
+    },
+    {
+      id: "yedalms-chrome", emoji: "🧩", title: "YedaLMS Chrome agent (Vitalina)",
+      description: "Chrome agent for YedaLMS.",
+      status: "waiting", urgency: "medium", color: null, progress: 10,
+      links: [], waitingPerson: "Vitalina", waitingWhat: "send the materials",
+      notes: [], createdAt: T, updatedAt: T,
+    },
+    {
+      id: "csmart", emoji: "🔗", title: "Csmart",
+      description: "Fix how leads are saved in Lead Manager. Add the webhook keys to the form fields.",
+      status: "new", urgency: "medium", color: null, progress: 0,
+      links: [], waitingPerson: "", waitingWhat: "",
+      notes: [], createdAt: T, updatedAt: T,
+    },
+    {
+      id: "calcalist", emoji: "📧", title: "Calcalist",
+      description: "Send a message to Ron.",
+      status: "new", urgency: "medium", color: null, progress: 0,
+      links: [], waitingPerson: "", waitingWhat: "",
+      notes: [], createdAt: T, updatedAt: T,
+    },
+    {
+      id: "habetzefer", emoji: "💬", title: "Chat / voice Agent - Habetzefer",
+      description: "Igal approved the chat and voice agent. Now I need to connect it to Zoho.",
+      status: "in-progress", urgency: "medium", color: null, progress: 50,
+      links: [{ id: "l-hab", label: "Demo agent", url: "https://app.targetbob.ai/public/demo/49b00641-e615-4d3b-820f-663970f5f97b" }],
+      waitingPerson: "", waitingWhat: "",
+      notes: [], createdAt: T, updatedAt: T,
+    },
+    {
+      id: "salty", emoji: "🧂", title: "Salty",
+      description: "- Improve the trigger\n- Finish the chatbot",
+      status: "in-progress", urgency: "medium", color: null, progress: 30,
+      links: [{ id: "l-salty", label: "saltrooms.co.il", url: "https://www.saltrooms.co.il" }],
+      waitingPerson: "", waitingWhat: "",
+      notes: [], createdAt: T, updatedAt: T,
+    },
+    {
+      id: "smart-trigger", emoji: "⚡", title: "New smart trigger",
+      description: `Alexey has to improve the plan.
+
+План (RU):
+
+Dynamic Page-Aware Trigger
+
+Нужно создать один умный триггер, который будет автоматически подстраиваться под разные главы разных страниц на сайте во время перехода между страницами и скролла на странице, в зависимости от контекста, вместо того чтобы создавать много разных триггеров для разных страниц.
+
+Триггер должен понимать, на какой странице находится посетитель, и менять свои тексты в зависимости от контекста страницы. Например, на странице с ценами он может задавать вопросы про стоимость услуг, а на странице с конкретным продуктом — предлагать помощь именно по этому продукту.
+
+Также триггер должен реагировать на скролл страницы. Когда пользователь переходит к другому разделу страницы, текст триггера может меняться в соответствии с тем контентом, который сейчас находится на экране.
+
+Кроме текста, триггер должен уметь менять свой внешний вид. Например, сначала это может быть обычный текстовый триггер, затем небольшой видеотриггер, потом другой формат. В зависимости от страницы и поведения пользователя триггер может переключаться между разными вариантами отображения. Для каждого отображения подбирать какие форматы агента будут показываться чат/звонок/форма.
+
+Для подготовки этой функциональности нужно также пройтись по существующим дизайнам в Figma и выбрать несколько вариантов триггеров разных форматов, которые смогут динамически сменять друг друга. Необходимо определить, какие именно варианты отображения будут использоваться в рамках одного динамического триггера и как они будут сочетаться между собой в разных сценариях.
+
+Все настройки должны управляться из админки TargetBob. Там должно быть можно настроить:
+• какие тексты показывать на разных страницах;
+• когда менять сообщения;
+• когда менять вид триггера;
+• какие форми агента есть в каждом виде триггера;
+• сколько времени показывать каждый вариант;
+• какие действия пользователя запускают смену триггера;
+• последовательность показа разных вариантов.
+
+Важно сохранять статистику по каждому варианту триггера. Нужно видеть:
+• сколько раз был показан каждый вариант;
+• на каких страницах он показывался;
+• сколько пользователей на него нажали;
+• какие варианты работают лучше всего;
+• какие варианты приводят к большему количеству открытий и лидов.
+
+Следующий этап — сделать так, чтобы после открытия триггера содержимое внутри него тоже подстраивалось под контекст страницы. Например, если пользователь находится на странице для организаций, то ему показываются вопросы и поля формы, связанные с организациями. Если он находится на другой странице, то вопросы и форма автоматически меняются под эту страницу.
+
+В итоге должен получиться один универсальный триггер, который сам меняет тексты, внешний вид и сценарии в зависимости от страницы и поведения пользователя, вместо большого количества отдельных триггеров.
+
+Важно, чтобы настройка такого динамического триггера выполнялась один раз при создании TargetBob, а не при каждом открытии сайта пользователем. Во время первоначальной настройки система может проанализировать страницы сайта, определить их контекст, подобрать релевантные тексты, сценарии и форматы триггеров. После этого все созданные настройки сохраняются и используются в работе без необходимости заново выполнять полный анализ сайта при каждом посещении. Также должна быть возможность обновления настроек через отдельную кнопку на странице админа в Таргетбоб. При обновлении пользователь может выбрать, нужно ли пересканировать весь сайт или только отдельные страницы, чтобы обновить тексты, сценарии или варианты триггеров только там, где были внесены изменения.`,
+      status: "waiting", urgency: "high", color: null, progress: 5,
+      links: [], waitingPerson: "Alexey", waitingWhat: "improve the plan",
+      notes: [], createdAt: T, updatedAt: T,
+    },
+    {
+      id: "calcalist-prices", emoji: "💰", title: "Calcalist - update agent prices",
+      description: "Update the agent's prices in Calcalist. Vitalina sent the table with the prices.",
+      status: "new", urgency: "medium", color: null, progress: 0,
+      links: [], waitingPerson: "", waitingWhat: "",
+      notes: [], createdAt: T, updatedAt: T,
+    },
+    {
+      id: "minrav", emoji: "🏗️", title: "Minrav - LMS agent",
+      description: "Create an agent for Minrav for the LMS platform.",
+      status: "in-progress", urgency: "medium", color: null, progress: 30,
+      links: [{ id: "l-minrav", label: "Demo agent", url: "https://app.targetbob.ai/public/demo/ef99e635-79ce-4a06-983b-71aad9b183ab" }],
+      waitingPerson: "", waitingWhat: "",
+      notes: [], createdAt: T, updatedAt: T,
+    },
+    {
+      id: "rashuyot", emoji: "🏛️", title: "Rashuyot - proposal page with agent",
+      description: "Proposal page for רשויות (authorities) with an embedded agent.",
+      status: "in-progress", urgency: "medium", color: null, progress: 60,
+      links: [{ id: "l-rashuyot", label: "offer.yedalms.io/rashuyot", url: "https://offer.yedalms.io/rashuyot" }],
+      waitingPerson: "", waitingWhat: "",
+      notes: [], createdAt: T, updatedAt: T,
     },
   ],
 };
 
-export function loadData(): AutomationsData {
+/* ------------------------------------------------------------------ */
+/*  Local persistence (offline fallback) + theme                      */
+/* ------------------------------------------------------------------ */
+const STORAGE_KEY = "yeda-tasks-data-v1";
+const AUTH_KEY = "yeda-tasks-role";
+const THEME_KEY = "yeda-tasks-theme";
+
+export function loadData(): TasksData {
   if (typeof window === "undefined") return INITIAL_DATA;
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -164,20 +215,9 @@ export function loadData(): AutomationsData {
   return INITIAL_DATA;
 }
 
-export function saveData(data: AutomationsData) {
+export function saveData(data: TasksData) {
   if (typeof window === "undefined") return;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-}
-
-export function checkAuth(): boolean {
-  if (typeof window === "undefined") return false;
-  return sessionStorage.getItem(AUTH_KEY) === "true";
-}
-
-export function setAuth(v: boolean) {
-  if (typeof window === "undefined") return;
-  if (v) sessionStorage.setItem(AUTH_KEY, "true");
-  else sessionStorage.removeItem(AUTH_KEY);
 }
 
 export function loadTheme(): "dark" | "light" {
@@ -190,42 +230,61 @@ export function saveTheme(t: "dark" | "light") {
   localStorage.setItem(THEME_KEY, t);
 }
 
-export const PASSWORD = "067270";
+/* ------------------------------------------------------------------ */
+/*  Roles / auth                                                       */
+/* ------------------------------------------------------------------ */
+export const ALEXEY_CODE = "alexey";
+export const KATERYNA_CODE = "kateryna";
 
-export async function fetchServerData(): Promise<AutomationsData> {
+export function roleFromCode(code: string): Role | null {
+  const c = code.trim().toLowerCase();
+  if (c === KATERYNA_CODE) return "kateryna";
+  if (c === ALEXEY_CODE) return "alexey";
+  return null;
+}
+
+export function loadRole(): Role {
+  if (typeof window === "undefined") return "viewer";
+  const r = sessionStorage.getItem(AUTH_KEY);
+  return r === "alexey" || r === "kateryna" ? r : "viewer";
+}
+
+export function saveRole(r: Role) {
+  if (typeof window === "undefined") return;
+  if (r === "viewer") sessionStorage.removeItem(AUTH_KEY);
+  else sessionStorage.setItem(AUTH_KEY, r);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Server sync (shared Vercel Blob storage)                           */
+/* ------------------------------------------------------------------ */
+export async function fetchServerData(): Promise<TasksData> {
   try {
     const res = await fetch(`/api/data?t=${Date.now()}`, { cache: "no-store" });
     if (res.ok) {
       const serverData = await res.json();
-      // Always prefer server data — save to localStorage for offline fallback
-      saveData(serverData);
+      saveData(serverData); // keep a local fallback copy
       return serverData;
     }
   } catch {
-    // fallback to localStorage
+    // fall back to localStorage
   }
   return loadData();
 }
 
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
 
-export function saveDataWithSync(data: AutomationsData, isLoggedIn: boolean) {
+// Both "alexey" and "kateryna" may write; viewers never sync.
+// The role string doubles as the server auth token.
+export function saveDataWithSync(data: TasksData, role: Role) {
   saveData(data);
-  if (!isLoggedIn) return;
-  // Debounce server saves to avoid spamming during slider drags
+  if (role === "viewer") return;
   if (saveTimer) clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
     fetch("/api/data", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-auth": PASSWORD },
+      headers: { "Content-Type": "application/json", "x-auth": role },
       body: JSON.stringify(data),
     }).catch(() => {});
   }, 500);
 }
-
-export const URGENCY_ORDER: Record<Urgency, number> = {
-  critical: 0,
-  high: 1,
-  medium: 2,
-  low: 3,
-};

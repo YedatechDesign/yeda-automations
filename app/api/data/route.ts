@@ -2,8 +2,9 @@ import { put, list } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { INITIAL_DATA } from "@/lib/data";
 
-const BLOB_PATH = "automations-data.json";
-const PASSWORD = "067270";
+const BLOB_PATH = "tasks-data.json";
+// Both roles may write to shared storage; the UI enforces what each may change.
+const ALLOWED_TOKENS = ["alexey", "kateryna"];
 
 export const dynamic = "force-dynamic";
 
@@ -26,8 +27,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const authHeader = request.headers.get("x-auth");
-  if (authHeader !== PASSWORD) {
+  const authHeader = request.headers.get("x-auth") ?? "";
+  if (!ALLOWED_TOKENS.includes(authHeader)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
