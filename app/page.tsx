@@ -18,18 +18,18 @@ import {
 /*  Status & Urgency config (each with an emoji)                       */
 /* ------------------------------------------------------------------ */
 const STATUS_CFG: Record<Status, { emoji: string; label: string; badge: string }> = {
-  new:           { emoji: "🆕", label: "Нова",     badge: "bg-gray-500/15 text-gray-400" },
-  "in-progress": { emoji: "🔄", label: "В роботі", badge: "bg-blue-500/15 text-blue-400" },
-  waiting:       { emoji: "⏳", label: "Очікує",   badge: "bg-amber-500/15 text-amber-400" },
+  new:           { emoji: "🆕", label: "Новая",    badge: "bg-gray-500/15 text-gray-400" },
+  "in-progress": { emoji: "🔄", label: "В работе", badge: "bg-blue-500/15 text-blue-400" },
+  waiting:       { emoji: "⏳", label: "Ожидает",  badge: "bg-amber-500/15 text-amber-400" },
   done:          { emoji: "✅", label: "Готово",   badge: "bg-emerald-500/15 text-emerald-400" },
 };
 const STATUS_LIST: Status[] = ["new", "in-progress", "waiting", "done"];
 
 const URGENCY_CFG: Record<Urgency, { emoji: string; label: string; cls: string }> = {
-  critical: { emoji: "🔴", label: "Критично", cls: "bg-red-500/15 text-red-400" },
-  high:     { emoji: "🟠", label: "Високо",   cls: "bg-orange-500/15 text-orange-400" },
-  medium:   { emoji: "🟡", label: "Середньо", cls: "bg-yellow-500/15 text-yellow-500" },
-  low:      { emoji: "⚪", label: "Низько",    cls: "bg-gray-500/15 text-gray-400" },
+  critical: { emoji: "🔴", label: "Критический", cls: "bg-red-500/15 text-red-400" },
+  high:     { emoji: "🟠", label: "Высокий",     cls: "bg-orange-500/15 text-orange-400" },
+  medium:   { emoji: "🟡", label: "Средний",     cls: "bg-yellow-500/15 text-yellow-500" },
+  low:      { emoji: "⚪", label: "Низкий",      cls: "bg-gray-500/15 text-gray-400" },
 };
 const URGENCY_LIST: Urgency[] = ["critical", "high", "medium", "low"];
 
@@ -90,13 +90,13 @@ function LoginModal({ onLogin, onClose }: { onLogin: (role: Role) => void; onClo
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={onClose}>
       <div className="bg-card border border-border rounded-2xl p-6 sm:p-8 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
-        <h2 className="text-xl font-bold text-heading mb-2 text-center">Вхід</h2>
-        <p className="text-xs text-text-muted text-center mb-6">Введи логін, щоб редагувати. Без логіну — лише перегляд.</p>
+        <h2 className="text-xl font-bold text-heading mb-2 text-center">Вход</h2>
+        <p className="text-xs text-text-muted text-center mb-6">Введи логин, чтобы редактировать. Без логина — только просмотр.</p>
         <form onSubmit={submit}>
-          <input type="password" value={code} onChange={(e) => setCode(e.target.value)} placeholder="Логін / код" autoFocus
+          <input type="password" value={code} onChange={(e) => setCode(e.target.value)} placeholder="Логин / код" autoFocus
             className={`w-full px-4 py-3 rounded-lg bg-input-bg border text-foreground placeholder-muted outline-none transition-colors ${error ? "border-red-500" : "border-border-hover focus:border-accent"}`} />
-          {error && <p className="text-red-400 text-sm mt-2">Невірний логін</p>}
-          <button type="submit" className="w-full mt-4 py-3 rounded-lg bg-accent hover:bg-accent-hover text-white font-medium transition-colors">Увійти</button>
+          {error && <p className="text-red-400 text-sm mt-2">Неверный логин</p>}
+          <button type="submit" className="w-full mt-4 py-3 rounded-lg bg-accent hover:bg-accent-hover text-white font-medium transition-colors">Войти</button>
         </form>
       </div>
     </div>
@@ -144,12 +144,12 @@ function TaskModal({ task, onSave, onClose }: {
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={onClose}>
       <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-        <h2 className="text-lg font-bold text-heading mb-5">{isEdit ? "Редагувати задачу" : "Нова задача"}</h2>
+        <h2 className="text-lg font-bold text-heading mb-5">{isEdit ? "Редактировать задачу" : "Новая задача"}</h2>
 
-        <label className="block text-xs text-text-secondary mb-1 font-medium">Емодзі + назва</label>
+        <label className="block text-xs text-text-secondary mb-1 font-medium">Эмодзи + название</label>
         <div className="flex gap-2 mb-2">
           <input value={emoji} onChange={(e) => setEmoji(e.target.value)} maxLength={4} className={`${ic} w-16 text-center text-lg`} placeholder="📌" />
-          <input value={title} onChange={(e) => setTitle(e.target.value)} className={`${ic} flex-1`} placeholder="Task title" autoFocus />
+          <input value={title} onChange={(e) => setTitle(e.target.value)} className={`${ic} flex-1`} placeholder="Название задачи" autoFocus />
         </div>
         <div className="flex flex-wrap gap-1 mb-3">
           {QUICK_EMOJIS.map((em) => (
@@ -158,35 +158,35 @@ function TaskModal({ task, onSave, onClose }: {
           ))}
         </div>
 
-        <label className="block text-xs text-text-secondary mb-1 font-medium">Опис</label>
-        <textarea value={description} onChange={(e) => setDescription(e.target.value)} className={`${ic} mb-4 min-h-[80px] resize-y`} placeholder="What needs to be done?" />
+        <label className="block text-xs text-text-secondary mb-1 font-medium">Описание</label>
+        <textarea value={description} onChange={(e) => setDescription(e.target.value)} className={`${ic} mb-4 min-h-[80px] resize-y`} placeholder="Что нужно сделать?" />
 
         {/* Links */}
-        <label className="block text-xs text-text-secondary mb-1 font-medium">Посилання</label>
+        <label className="block text-xs text-text-secondary mb-1 font-medium">Ссылки</label>
         <div className="space-y-2 mb-2">
           {links.map((l, i) => (
             <div key={l.id} className="flex gap-2">
-              <input value={l.label} onChange={(e) => setLinks((p) => p.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)))} className={`${ic} w-1/3`} placeholder="Назва" />
+              <input value={l.label} onChange={(e) => setLinks((p) => p.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)))} className={`${ic} w-1/3`} placeholder="Название" />
               <input value={l.url} onChange={(e) => setLinks((p) => p.map((x, j) => (j === i ? { ...x, url: e.target.value } : x)))} className={`${ic} flex-1`} placeholder="https://..." />
               <button type="button" onClick={() => setLinks((p) => p.filter((_, j) => j !== i))} className="p-2 rounded-lg text-text-muted hover:text-red-400 hover:bg-border/40 transition-colors"><XIcon /></button>
             </div>
           ))}
         </div>
         <button type="button" onClick={() => setLinks((p) => [...p, { id: generateId(), label: "", url: "" }])}
-          className="text-xs text-accent hover:text-blue-300 mb-4">+ Додати посилання</button>
+          className="text-xs text-accent hover:text-blue-300 mb-4">+ Добавить ссылку</button>
 
         {/* Waiting for */}
-        <label className="block text-xs text-text-secondary mb-1 font-medium">⏳ Чекаю на (кого / що має зробити)</label>
+        <label className="block text-xs text-text-secondary mb-1 font-medium">⏳ Жду (кого / что должен сделать)</label>
         <div className="flex gap-2 mb-4">
-          <input value={waitingPerson} onChange={(e) => setWaitingPerson(e.target.value)} className={`${ic} w-1/3`} placeholder="Ім'я" />
-          <input value={waitingWhat} onChange={(e) => setWaitingWhat(e.target.value)} className={`${ic} flex-1`} placeholder="Що він має зробити" />
+          <input value={waitingPerson} onChange={(e) => setWaitingPerson(e.target.value)} className={`${ic} w-1/3`} placeholder="Имя" />
+          <input value={waitingWhat} onChange={(e) => setWaitingWhat(e.target.value)} className={`${ic} flex-1`} placeholder="Что он должен сделать" />
         </div>
 
         {/* Color */}
-        <label className="block text-xs text-text-secondary mb-1 font-medium">Колір</label>
+        <label className="block text-xs text-text-secondary mb-1 font-medium">Цвет</label>
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <button type="button" onClick={() => setColor(null)}
-            className={`w-7 h-7 rounded-full border border-border-hover flex items-center justify-center text-[10px] text-text-muted ${color === null ? "ring-2 ring-accent" : ""}`} title="Без кольору">∅</button>
+            className={`w-7 h-7 rounded-full border border-border-hover flex items-center justify-center text-[10px] text-text-muted ${color === null ? "ring-2 ring-accent" : ""}`} title="Без цвета">∅</button>
           {COLORS.map((c) => (
             <button key={c} type="button" onClick={() => setColor(c)} style={{ backgroundColor: c }}
               className={`w-7 h-7 rounded-full transition-transform ${color === c ? "ring-2 ring-offset-2 ring-offset-card ring-foreground" : ""}`} title={c} />
@@ -194,7 +194,7 @@ function TaskModal({ task, onSave, onClose }: {
         </div>
 
         {/* Progress */}
-        <label className="block text-xs text-text-secondary mb-1 font-medium">Прогрес: {progress}%</label>
+        <label className="block text-xs text-text-secondary mb-1 font-medium">Прогресс: {progress}%</label>
         <input type="range" min={0} max={100} value={progress} onChange={(e) => setProgress(Number(e.target.value))}
           style={{ accentColor: color || DEFAULT_ACCENT }} className="w-full h-2 mb-4 cursor-pointer" />
 
@@ -206,7 +206,7 @@ function TaskModal({ task, onSave, onClose }: {
             </select>
           </div>
           <div>
-            <label className="block text-xs text-text-secondary mb-1 font-medium">Терміновість</label>
+            <label className="block text-xs text-text-secondary mb-1 font-medium">Срочность</label>
             <select value={urgency} onChange={(e) => setUrgency(e.target.value as Urgency)} className={ic}>
               {URGENCY_LIST.map((u) => <option key={u} value={u}>{URGENCY_CFG[u].emoji} {URGENCY_CFG[u].label}</option>)}
             </select>
@@ -214,8 +214,8 @@ function TaskModal({ task, onSave, onClose }: {
         </div>
 
         <div className="flex gap-3 justify-end">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg text-text-secondary hover:text-heading transition-colors text-sm">Скасувати</button>
-          <button onClick={handleSave} className="px-5 py-2 rounded-lg bg-accent hover:bg-accent-hover text-white font-medium transition-colors text-sm">{isEdit ? "Зберегти" : "Створити"}</button>
+          <button onClick={onClose} className="px-4 py-2 rounded-lg text-text-secondary hover:text-heading transition-colors text-sm">Отменить</button>
+          <button onClick={handleSave} className="px-5 py-2 rounded-lg bg-accent hover:bg-accent-hover text-white font-medium transition-colors text-sm">{isEdit ? "Сохранить" : "Создать"}</button>
         </div>
       </div>
     </div>
@@ -230,14 +230,14 @@ function NoteModal({ onSave, onClose }: { onSave: (text: string) => void; onClos
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={onClose}>
       <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
-        <h2 className="text-lg font-bold text-heading mb-4">Додати нотатку</h2>
+        <h2 className="text-lg font-bold text-heading mb-4">Добавить заметку</h2>
         <textarea value={text} onChange={(e) => setText(e.target.value)}
           className="w-full px-3 py-2.5 rounded-lg bg-input-bg border border-border-hover text-foreground placeholder-muted outline-none focus:border-accent transition-colors text-sm min-h-[90px] resize-y"
-          placeholder="Напиши коментар або примітку..." autoFocus />
+          placeholder="Напиши комментарий или заметку..." autoFocus />
         <div className="flex gap-3 justify-end mt-4">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg text-text-secondary hover:text-heading transition-colors text-sm">Скасувати</button>
+          <button onClick={onClose} className="px-4 py-2 rounded-lg text-text-secondary hover:text-heading transition-colors text-sm">Отменить</button>
           <button onClick={() => { if (text.trim()) onSave(text.trim()); }}
-            className="px-4 py-2 rounded-lg bg-accent hover:bg-accent-hover text-white font-medium transition-colors text-sm">Додати</button>
+            className="px-4 py-2 rounded-lg bg-accent hover:bg-accent-hover text-white font-medium transition-colors text-sm">Добавить</button>
         </div>
       </div>
     </div>
@@ -253,8 +253,8 @@ function ConfirmModal({ message, onConfirm, onCancel }: { message: string; onCon
       <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
         <p className="text-heading text-sm mb-5">{message}</p>
         <div className="flex gap-3 justify-end">
-          <button onClick={onCancel} className="px-4 py-2 rounded-lg text-text-secondary hover:text-heading transition-colors text-sm">Скасувати</button>
-          <button onClick={onConfirm} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium transition-colors text-sm">Видалити</button>
+          <button onClick={onCancel} className="px-4 py-2 rounded-lg text-text-secondary hover:text-heading transition-colors text-sm">Отменить</button>
+          <button onClick={onConfirm} className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium transition-colors text-sm">Удалить</button>
         </div>
       </div>
     </div>
@@ -290,7 +290,7 @@ function TaskCard({ task, index, role, isFirst, isLast, onMove, onSetStatus, onS
         {canManage && !isDone && (
           <div className="flex flex-col shrink-0 -my-1">
             <button onClick={() => onMove(task.id, -1)} disabled={isFirst}
-              className="p-0.5 rounded text-text-muted hover:text-accent disabled:opacity-20 disabled:hover:text-text-muted transition-colors" title="Вгору"><ArrowUp /></button>
+              className="p-0.5 rounded text-text-muted hover:text-accent disabled:opacity-20 disabled:hover:text-text-muted transition-colors" title="Вверх"><ArrowUp /></button>
             <button onClick={() => onMove(task.id, 1)} disabled={isLast}
               className="p-0.5 rounded text-text-muted hover:text-accent disabled:opacity-20 disabled:hover:text-text-muted transition-colors" title="Вниз"><ArrowDown /></button>
           </div>
@@ -338,7 +338,7 @@ function TaskCard({ task, index, role, isFirst, isLast, onMove, onSetStatus, onS
           {/* Waiting for */}
           {(task.waitingPerson || task.waitingWhat) && (
             <div className="mb-4 rounded-lg bg-amber-500/10 border border-amber-500/20 px-3 py-2 text-sm">
-              <span className="text-amber-500 font-medium">⏳ Чекаю{task.waitingPerson ? ` на ${task.waitingPerson}` : ""}</span>
+              <span className="text-amber-500 font-medium">⏳ Жду{task.waitingPerson ? ` ${task.waitingPerson}` : ""}</span>
               {task.waitingWhat && <span className="text-text-secondary">: {task.waitingWhat}</span>}
             </div>
           )}
@@ -347,7 +347,7 @@ function TaskCard({ task, index, role, isFirst, isLast, onMove, onSetStatus, onS
           {canFull && (
             <div className="mb-4">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] font-semibold text-text-muted uppercase tracking-widest">Прогрес</span>
+                <span className="text-[10px] font-semibold text-text-muted uppercase tracking-widest">Прогресс</span>
                 <span className="text-xs text-text-secondary font-semibold">{task.progress}%</span>
               </div>
               <input type="range" min={0} max={100} value={task.progress}
@@ -369,7 +369,7 @@ function TaskCard({ task, index, role, isFirst, isLast, onMove, onSetStatus, onS
                 </label>
               )}
               <label className="flex items-center gap-2 text-[11px] text-text-muted">
-                <span className="uppercase tracking-widest font-semibold">Терміновість</span>
+                <span className="uppercase tracking-widest font-semibold">Срочность</span>
                 <select value={task.urgency} onChange={(e) => onSetUrgency(task.id, e.target.value as Urgency)}
                   className="px-2 py-1 rounded-md bg-input-bg border border-border-hover text-foreground text-xs outline-none focus:border-accent">
                   {URGENCY_LIST.map((u) => <option key={u} value={u}>{URGENCY_CFG[u].emoji} {URGENCY_CFG[u].label}</option>)}
@@ -381,7 +381,7 @@ function TaskCard({ task, index, role, isFirst, isLast, onMove, onSetStatus, onS
           {/* Notes */}
           {task.notes.length > 0 && (
             <div className="mb-4">
-              <h4 className="text-[10px] font-semibold text-text-muted uppercase tracking-widest mb-2">Нотатки</h4>
+              <h4 className="text-[10px] font-semibold text-text-muted uppercase tracking-widest mb-2">Заметки</h4>
               <div className="space-y-2">
                 {task.notes.map((note) => (
                   <div key={note.id} className="bg-background rounded-lg p-3 text-sm">
@@ -394,7 +394,7 @@ function TaskCard({ task, index, role, isFirst, isLast, onMove, onSetStatus, onS
                     <div className="flex items-center gap-2 mt-2 text-[11px] text-text-muted">
                       <span className="font-medium">{ROLE_LABEL[note.author] || "—"}</span>
                       <span>·</span>
-                      <span>{new Date(note.createdAt).toLocaleDateString("uk-UA", { day: "numeric", month: "short" })}</span>
+                      <span>{new Date(note.createdAt).toLocaleDateString("ru-RU", { day: "numeric", month: "short" })}</span>
                     </div>
                   </div>
                 ))}
@@ -405,17 +405,17 @@ function TaskCard({ task, index, role, isFirst, isLast, onMove, onSetStatus, onS
           {/* Actions */}
           {canManage && (
             <div className="flex gap-2 flex-wrap">
-              <button onClick={() => onAddNote(task.id)} className="text-xs px-3 py-1.5 rounded-lg bg-border/30 text-text-secondary hover:text-heading hover:bg-border/60 transition-colors">+ Нотатка</button>
+              <button onClick={() => onAddNote(task.id)} className="text-xs px-3 py-1.5 rounded-lg bg-border/30 text-text-secondary hover:text-heading hover:bg-border/60 transition-colors">+ Заметка</button>
               {canFull && !isDone && (
                 <button onClick={() => onMarkDone(task.id)} className="text-xs px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-500/80 hover:text-emerald-400 hover:bg-emerald-500/20 transition-colors">✅ Готово</button>
               )}
               {canFull && isDone && (
-                <button onClick={() => onReturnActive(task.id)} className="text-xs px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-400/80 hover:text-blue-400 hover:bg-blue-500/20 transition-colors">↩ Повернути в роботу</button>
+                <button onClick={() => onReturnActive(task.id)} className="text-xs px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-400/80 hover:text-blue-400 hover:bg-blue-500/20 transition-colors">↩ Вернуть в работу</button>
               )}
               {canFull && (
                 <>
-                  <button onClick={() => onEdit(task)} className="text-xs px-3 py-1.5 rounded-lg bg-border/30 text-text-secondary hover:text-heading hover:bg-border/60 transition-colors">Редагувати</button>
-                  <button onClick={() => onDelete(task.id)} className="text-xs px-3 py-1.5 rounded-lg bg-border/30 text-red-400/60 hover:text-red-400 hover:bg-red-900/20 transition-colors">Видалити</button>
+                  <button onClick={() => onEdit(task)} className="text-xs px-3 py-1.5 rounded-lg bg-border/30 text-text-secondary hover:text-heading hover:bg-border/60 transition-colors">Редактировать</button>
+                  <button onClick={() => onDelete(task.id)} className="text-xs px-3 py-1.5 rounded-lg bg-border/30 text-red-400/60 hover:text-red-400 hover:bg-red-900/20 transition-colors">Удалить</button>
                 </>
               )}
             </div>
@@ -542,7 +542,7 @@ export default function TasksBoard() {
         </div>
         <div className="flex items-center gap-2 sm:gap-2.5">
           {role !== "viewer" && <span className="hidden sm:inline text-xs text-text-muted">{ROLE_LABEL[role]}</span>}
-          <button onClick={toggleTheme} className="p-2 rounded-lg border border-border-hover text-text-secondary hover:text-heading hover:border-text-muted transition-colors" title={theme === "dark" ? "Світла тема" : "Темна тема"}>
+          <button onClick={toggleTheme} className="p-2 rounded-lg border border-border-hover text-text-secondary hover:text-heading hover:border-text-muted transition-colors" title={theme === "dark" ? "Светлая тема" : "Тёмная тема"}>
             {theme === "dark" ? <SunIcon /> : <MoonIcon />}
           </button>
           {canFull && (
@@ -551,35 +551,35 @@ export default function TasksBoard() {
           )}
           <button onClick={() => role !== "viewer" ? doLogout() : setShowLogin(true)}
             className="px-3 sm:px-4 py-2 rounded-lg border border-border-hover text-text-secondary hover:text-heading hover:border-text-muted text-xs sm:text-sm transition-colors">
-            {role !== "viewer" ? "Вийти" : "Увійти"}
+            {role !== "viewer" ? "Выйти" : "Войти"}
           </button>
         </div>
       </header>
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 pb-16">
         <p className="text-right text-[11px] text-text-muted mb-4">
-          Оновлено: {new Date().toLocaleDateString("uk-UA", { day: "numeric", month: "short", year: "numeric" })}
+          Обновлено: {new Date().toLocaleDateString("ru-RU", { day: "numeric", month: "short", year: "numeric" })}
         </p>
 
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-6">
-          <StatCard value={stats.total} label="Усього задач" />
-          <StatCard value={stats.inProgress} label="В роботі" />
+          <StatCard value={stats.total} label="Всего задач" />
+          <StatCard value={stats.inProgress} label="В работе" />
           <StatCard value={stats.done} label="Готово" />
-          <StatCard value={`${stats.pct}%`} label="Виконано" />
+          <StatCard value={`${stats.pct}%`} label="Выполнено" />
         </div>
 
         {/* Tabs */}
         <div className="flex items-center gap-2 mb-5">
-          <button onClick={() => setTab("active")} className={tabBtn("active")}>📋 Активні ({activeTasks.length})</button>
-          <button onClick={() => setTab("done")} className={tabBtn("done")}>✅ Зроблено ({doneTasks.length})</button>
+          <button onClick={() => setTab("active")} className={tabBtn("active")}>📋 Активные ({activeTasks.length})</button>
+          <button onClick={() => setTab("done")} className={tabBtn("done")}>✅ Сделано ({doneTasks.length})</button>
         </div>
 
         {shown.length === 0 ? (
           <div className="bg-card border border-border rounded-2xl py-16 text-center">
-            <p className="text-text-secondary text-base mb-2">{tab === "active" ? "Активних задач немає" : "Зроблених задач поки немає"}</p>
+            <p className="text-text-secondary text-base mb-2">{tab === "active" ? "Активных задач нет" : "Сделанных задач пока нет"}</p>
             {tab === "active" && canFull && (
-              <button onClick={() => { setEditingTask(null); setShowTaskModal(true); }} className="text-accent hover:text-blue-300 text-sm">Створити задачу</button>
+              <button onClick={() => { setEditingTask(null); setShowTaskModal(true); }} className="text-accent hover:text-blue-300 text-sm">Создать задачу</button>
             )}
           </div>
         ) : (
@@ -595,7 +595,7 @@ export default function TasksBoard() {
       {showLogin && <LoginModal onLogin={doLogin} onClose={() => setShowLogin(false)} />}
       {showTaskModal && canFull && <TaskModal task={editingTask} onSave={handleSaveTask} onClose={() => { setShowTaskModal(false); setEditingTask(null); }} />}
       {noteTarget && canManage && <NoteModal onSave={handleAddNote} onClose={() => setNoteTarget(null)} />}
-      {deleteTarget && <ConfirmModal message="Видалити цю задачу?" onConfirm={handleDelete} onCancel={() => setDeleteTarget(null)} />}
+      {deleteTarget && <ConfirmModal message="Удалить эту задачу?" onConfirm={handleDelete} onCancel={() => setDeleteTarget(null)} />}
     </div>
   );
 }

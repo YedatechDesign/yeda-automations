@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Yeda — Список задач",
-  description: "Список задач та їх статус",
+  description: "Список задач и их статус",
 };
 
 export default function RootLayout({
