@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Yeda — Список задач",
+  title: "Kate's Tasks",
   description: "Список задач и их статус",
 };
 

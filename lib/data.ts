@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
-export type Status = "new" | "in-progress" | "waiting" | "done";
+export type Status = "new" | "in-progress" | "done";
 export type Urgency = "critical" | "high" | "medium" | "low";
 export type Role = "viewer" | "alexey" | "kateryna";
 
@@ -47,6 +47,15 @@ export function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
+// Map any legacy "waiting" status (removed in favour of the waiting-for field) to "in-progress".
+export function normalizeData(d: TasksData): TasksData {
+  return {
+    tasks: (d.tasks ?? []).map((t) =>
+      (t.status as string) === "waiting" ? { ...t, status: "in-progress" as Status } : t
+    ),
+  };
+}
+
 export const URGENCY_ORDER: Record<Urgency, number> = {
   critical: 0,
   high: 1,
@@ -86,7 +95,7 @@ export const INITIAL_DATA: TasksData = {
     {
       id: "orin", emoji: "🤖", title: "Orin Shpalter (Seva)",
       description: "Create an agent that guides workers on how to use Rivhit and Oketz.\nAlready created and sent to Seva.",
-      status: "waiting", urgency: "medium", color: null, progress: 90,
+      status: "in-progress", urgency: "medium", color: null, progress: 90,
       links: [{ id: "l-orin", label: "Demo agent", url: "https://app.targetbob.ai/public/demo/c36de657-d4df-44ac-bc2c-bbfd10507d90" }],
       waitingPerson: "Seva", waitingWhat: "feedback - whether anything needs to be changed",
       notes: [], createdAt: T, updatedAt: T,
@@ -94,7 +103,7 @@ export const INITIAL_DATA: TasksData = {
     {
       id: "yedalms-chrome", emoji: "🧩", title: "YedaLMS Chrome agent (Vitalina)",
       description: "Chrome agent for YedaLMS.",
-      status: "waiting", urgency: "medium", color: null, progress: 10,
+      status: "in-progress", urgency: "medium", color: null, progress: 10,
       links: [], waitingPerson: "Vitalina", waitingWhat: "send the materials",
       notes: [], createdAt: T, updatedAt: T,
     },
@@ -167,7 +176,7 @@ Dynamic Page-Aware Trigger
 В итоге должен получиться один универсальный триггер, который сам меняет тексты, внешний вид и сценарии в зависимости от страницы и поведения пользователя, вместо большого количества отдельных триггеров.
 
 Важно, чтобы настройка такого динамического триггера выполнялась один раз при создании TargetBob, а не при каждом открытии сайта пользователем. Во время первоначальной настройки система может проанализировать страницы сайта, определить их контекст, подобрать релевантные тексты, сценарии и форматы триггеров. После этого все созданные настройки сохраняются и используются в работе без необходимости заново выполнять полный анализ сайта при каждом посещении. Также должна быть возможность обновления настроек через отдельную кнопку на странице админа в Таргетбоб. При обновлении пользователь может выбрать, нужно ли пересканировать весь сайт или только отдельные страницы, чтобы обновить тексты, сценарии или варианты триггеров только там, где были внесены изменения.`,
-      status: "waiting", urgency: "high", color: null, progress: 5,
+      status: "new", urgency: "high", color: null, progress: 5,
       links: [], waitingPerson: "Alexey", waitingWhat: "improve the plan",
       notes: [], createdAt: T, updatedAt: T,
     },
@@ -208,7 +217,7 @@ export function loadData(): TasksData {
   if (typeof window === "undefined") return INITIAL_DATA;
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) return JSON.parse(stored);
+    if (stored) return normalizeData(JSON.parse(stored));
   } catch {
     // ignore
   }
@@ -262,7 +271,7 @@ export async function fetchServerData(): Promise<TasksData> {
   try {
     const res = await fetch(`/api/data?t=${Date.now()}`, { cache: "no-store" });
     if (res.ok) {
-      const serverData = await res.json();
+      const serverData = normalizeData(await res.json());
       saveData(serverData); // keep a local fallback copy
       return serverData;
     }

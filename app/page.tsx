@@ -20,10 +20,9 @@ import {
 const STATUS_CFG: Record<Status, { emoji: string; label: string; badge: string }> = {
   new:           { emoji: "🆕", label: "Новая",    badge: "bg-gray-500/15 text-gray-400" },
   "in-progress": { emoji: "🔄", label: "В работе", badge: "bg-blue-500/15 text-blue-400" },
-  waiting:       { emoji: "⏳", label: "Ожидает",  badge: "bg-amber-500/15 text-amber-400" },
   done:          { emoji: "✅", label: "Готово",   badge: "bg-emerald-500/15 text-emerald-400" },
 };
-const STATUS_LIST: Status[] = ["new", "in-progress", "waiting", "done"];
+const STATUS_LIST: Status[] = ["new", "in-progress", "done"];
 
 const URGENCY_CFG: Record<Urgency, { emoji: string; label: string; cls: string }> = {
   critical: { emoji: "🔴", label: "Критический", cls: "bg-red-500/15 text-red-400" },
@@ -537,8 +536,8 @@ export default function TasksBoard() {
     <div className="min-h-screen bg-background transition-colors duration-300">
       <header className="max-w-3xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8 pb-2 flex items-start justify-between">
         <div>
-          <img src={theme === "dark" ? "/yeda-logo-white.png" : "/yeda-logo-blue.png"} alt="Yeda" className="h-7 sm:h-9 w-auto" />
-          <p className="text-text-muted text-xs sm:text-sm mt-1.5">Список задач</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-heading">{"Kate's Tasks"}</h1>
+          <p className="text-text-muted text-xs sm:text-sm mt-0.5">Список задач</p>
         </div>
         <div className="flex items-center gap-2 sm:gap-2.5">
           {role !== "viewer" && <span className="hidden sm:inline text-xs text-text-muted">{ROLE_LABEL[role]}</span>}
