@@ -386,7 +386,7 @@ function TaskCard({ task, index, role, isFirst, isLast, onMove, onSetStatus, onS
               <h4 className="text-[10px] font-semibold text-text-muted uppercase tracking-widest mb-2">Заметки</h4>
               <div className="space-y-2">
                 {task.notes.map((note) => (
-                  <div key={note.id} className="bg-background rounded-lg p-3 text-sm">
+                  <div key={note.id} className={`rounded-lg p-3 text-sm ${note.author === "alexey" ? "bg-red-500/10 border border-red-500/25" : "bg-background"}`}>
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-text-secondary whitespace-pre-wrap flex-1 leading-relaxed">{note.text}</p>
                       {canManage && (
