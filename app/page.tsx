@@ -315,7 +315,10 @@ function TaskCard({ task, index, role, isFirst, isLast, onMove, onSetStatus, onS
             <span className="text-[11px] text-text-muted font-semibold shrink-0">{task.progress}%</span>
           </div>
         </div>
-        <ChevronDown className={`w-4 h-4 sm:w-5 sm:h-5 text-text-muted transition-transform shrink-0 cursor-pointer ${open ? "rotate-180" : ""}`} />
+        <button onClick={() => setOpen(!open)} aria-label={open ? "Свернуть" : "Открыть"}
+          className="shrink-0 p-1 -m-1 text-text-muted hover:text-heading transition-colors">
+          <ChevronDown className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${open ? "rotate-180" : ""}`} />
+        </button>
       </div>
 
       {open && (
