@@ -68,6 +68,14 @@ export const INITIAL_CREDENTIALS: Credential[] = [
     login: "design@yedatech.io",
     password: "Yeda2026",
   },
+  {
+    id: "dscope-dashboard",
+    name: "Dscope - дашборд лидов",
+    description: "Дашборд лидов Dscope.",
+    url: "https://targetbob-dashboard.vercel.app",
+    login: "alexey",
+    password: "",
+  },
 ];
 
 // Map any legacy "waiting" status (removed in favour of the waiting-for field) to "in-progress";
