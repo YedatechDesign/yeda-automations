@@ -35,9 +35,19 @@ export interface Task {
   updatedAt: string;
 }
 
+export interface Credential {
+  id: string;
+  name: string;
+  description: string; // short description of the platform
+  url: string; // opens in a new tab
+  login: string; // "" if none
+  password: string; // "" if none
+}
+
 export interface TasksData {
   // display order === array order; reordering mutates the array
   tasks: Task[];
+  credentials: Credential[]; // "Пароли" tab — visible to logged-in roles only
 }
 
 /* ------------------------------------------------------------------ */
@@ -47,12 +57,27 @@ export function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
-// Map any legacy "waiting" status (removed in favour of the waiting-for field) to "in-progress".
+// Passwords tab seed — shown until the stored blob has its own credentials list.
+export const INITIAL_CREDENTIALS: Credential[] = [
+  {
+    id: "automations-yedalms",
+    name: "Automations YedaLMS",
+    description:
+      "Платформа для управления автоматизациями для колледжей: дашборд + автоматизация домашних заданий. Супер-админ: создание колледжей; клик по колледжу открывает превью платформы глазами админа колледжа.",
+    url: "https://automations.yedalms.io",
+    login: "design@yedatech.io",
+    password: "Yeda2026",
+  },
+];
+
+// Map any legacy "waiting" status (removed in favour of the waiting-for field) to "in-progress";
+// seed credentials when the stored data has none yet.
 export function normalizeData(d: TasksData): TasksData {
   return {
     tasks: (d.tasks ?? []).map((t) =>
       (t.status as string) === "waiting" ? { ...t, status: "in-progress" as Status } : t
     ),
+    credentials: d.credentials ?? INITIAL_CREDENTIALS,
   };
 }
 
@@ -204,6 +229,7 @@ Dynamic Page-Aware Trigger
       notes: [], createdAt: T, updatedAt: T,
     },
   ],
+  credentials: INITIAL_CREDENTIALS,
 };
 
 /* ------------------------------------------------------------------ */

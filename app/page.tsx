@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import type { Task, TasksData, TaskNote, TaskLink, Status, Urgency, Role } from "@/lib/data";
+import type { Task, TasksData, TaskNote, TaskLink, Credential, Status, Urgency, Role } from "@/lib/data";
 import {
   INITIAL_DATA,
   generateId,
@@ -60,6 +60,18 @@ function SunIcon() {
 }
 function MoonIcon() {
   return <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" /></svg>;
+}
+function CopyButton({ value, label }: { value: string; label: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button type="button" title={`Копировать ${label}`} aria-label={`Копировать ${label}`}
+      onClick={() => { navigator.clipboard?.writeText(value); setCopied(true); setTimeout(() => setCopied(false), 1500); }}
+      className="shrink-0 p-1 rounded-md text-text-muted hover:text-accent hover:bg-border/40 transition-colors">
+      {copied
+        ? <svg className="w-3.5 h-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+        : <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" /></svg>}
+    </button>
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -261,6 +273,101 @@ function ConfirmModal({ message, onConfirm, onCancel }: { message: string; onCon
 }
 
 /* ------------------------------------------------------------------ */
+/*  Credential Modal (Add / Edit) — kateryna only                      */
+/* ------------------------------------------------------------------ */
+function CredentialModal({ credential, onSave, onClose }: {
+  credential: Credential | null; onSave: (c: Credential) => void; onClose: () => void;
+}) {
+  const isEdit = !!credential;
+  const [name, setName] = useState(credential?.name ?? "");
+  const [description, setDescription] = useState(credential?.description ?? "");
+  const [url, setUrl] = useState(credential?.url ?? "");
+  const [login, setLogin] = useState(credential?.login ?? "");
+  const [password, setPassword] = useState(credential?.password ?? "");
+  const ic = "w-full px-3 py-2.5 rounded-lg bg-input-bg border border-border-hover text-foreground placeholder-muted outline-none focus:border-accent transition-colors text-sm";
+  const handleSave = () => {
+    if (!name.trim()) return;
+    onSave({ id: credential?.id ?? generateId(), name: name.trim(), description: description.trim(), url: url.trim(), login: login.trim(), password: password.trim() });
+  };
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <h2 className="text-lg font-bold text-heading mb-5">{isEdit ? "Редактировать платформу" : "Новая платформа"}</h2>
+        <label className="block text-xs text-text-secondary mb-1 font-medium">Название</label>
+        <input value={name} onChange={(e) => setName(e.target.value)} className={`${ic} mb-3`} placeholder="Название платформы" autoFocus />
+        <label className="block text-xs text-text-secondary mb-1 font-medium">Короткое описание</label>
+        <textarea value={description} onChange={(e) => setDescription(e.target.value)} className={`${ic} mb-3 min-h-[70px] resize-y`} placeholder="Для чего эта платформа" />
+        <label className="block text-xs text-text-secondary mb-1 font-medium">Ссылка</label>
+        <input value={url} onChange={(e) => setUrl(e.target.value)} className={`${ic} mb-3`} placeholder="https://..." />
+        <div className="grid grid-cols-2 gap-3 mb-5">
+          <div>
+            <label className="block text-xs text-text-secondary mb-1 font-medium">Логин</label>
+            <input value={login} onChange={(e) => setLogin(e.target.value)} className={ic} placeholder="(если есть)" />
+          </div>
+          <div>
+            <label className="block text-xs text-text-secondary mb-1 font-medium">Пароль</label>
+            <input value={password} onChange={(e) => setPassword(e.target.value)} className={ic} placeholder="(если есть)" />
+          </div>
+        </div>
+        <div className="flex gap-3 justify-end">
+          <button onClick={onClose} className="px-4 py-2 rounded-lg text-text-secondary hover:text-heading transition-colors text-sm">Отменить</button>
+          <button onClick={handleSave} className="px-5 py-2 rounded-lg bg-accent hover:bg-accent-hover text-white font-medium transition-colors text-sm">{isEdit ? "Сохранить" : "Создать"}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Credential Card (Пароли tab)                                       */
+/* ------------------------------------------------------------------ */
+function CredRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-[10px] font-semibold text-text-muted uppercase tracking-widest w-14 shrink-0">{label}</span>
+      <span className="text-xs text-text-secondary bg-background px-2 py-1 rounded-md font-mono break-all flex-1 min-w-0">{value}</span>
+      <CopyButton value={value} label={label} />
+    </div>
+  );
+}
+
+function CredentialCard({ credential, canFull, onEdit, onDelete }: {
+  credential: Credential; canFull: boolean; onEdit: (c: Credential) => void; onDelete: (id: string) => void;
+}) {
+  const c = credential;
+  return (
+    <div className="rounded-xl px-3 sm:px-4 py-3 hover:bg-card-hover transition-smooth">
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-semibold text-heading text-sm sm:text-[15px]">🔑 {c.name}</span>
+            {c.url && (
+              <a href={c.url} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-lg bg-accent/10 text-accent hover:bg-accent/20 transition-colors">
+                <LinkIcon />Открыть
+              </a>
+            )}
+          </div>
+          {c.description && <p className="text-sm text-text-secondary mt-1 leading-relaxed">{c.description}</p>}
+        </div>
+        {canFull && (
+          <div className="flex items-center gap-0.5 shrink-0">
+            <button onClick={() => onEdit(c)} className="text-xs px-2 py-1 rounded-md text-text-secondary hover:text-heading hover:bg-border/50 transition-colors">Изм.</button>
+            <button onClick={() => onDelete(c.id)} className="p-1 rounded-md text-text-muted hover:text-red-400 hover:bg-border/40 transition-colors"><XIcon /></button>
+          </div>
+        )}
+      </div>
+      {(c.login || c.password) && (
+        <div className="mt-3 space-y-1.5">
+          {c.login && <CredRow label="Логин" value={c.login} />}
+          {c.password && <CredRow label="Пароль" value={c.password} />}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /*  Task Card                                                          */
 /* ------------------------------------------------------------------ */
 function TaskCard({ task, index, role, isFirst, isLast, onMove, onSetStatus, onSetUrgency, onSetProgress, onMarkDone, onReturnActive, onEdit, onDelete, onAddNote, onDeleteNote }: {
@@ -434,12 +541,15 @@ function TaskCard({ task, index, role, isFirst, isLast, onMove, onSetStatus, onS
 export default function TasksBoard() {
   const [data, setData] = useState<TasksData>(INITIAL_DATA);
   const [role, setRole] = useState<Role>("viewer");
-  const [tab, setTab] = useState<"active" | "done">("active");
+  const [tab, setTab] = useState<"active" | "done" | "creds">("active");
   const [showLogin, setShowLogin] = useState(false);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [noteTarget, setNoteTarget] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [showCredModal, setShowCredModal] = useState(false);
+  const [editingCred, setEditingCred] = useState<Credential | null>(null);
+  const [deleteCredTarget, setDeleteCredTarget] = useState<string | null>(null);
   const [theme, setTheme] = useState<"dark" | "light">("light");
   const [loaded, setLoaded] = useState(false);
 
@@ -460,20 +570,20 @@ export default function TasksBoard() {
   const canManage = role === "alexey" || role === "kateryna";
 
   const doLogin = (r: Role) => { setRole(r); saveRole(r); setShowLogin(false); };
-  const doLogout = () => { setRole("viewer"); saveRole("viewer"); };
+  const doLogout = () => { setRole("viewer"); saveRole("viewer"); setTab("active"); };
   const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
 
   const handleSaveTask = (t: Task) => {
     update((prev) => {
       const exists = prev.tasks.some((x) => x.id === t.id);
-      return { tasks: exists ? prev.tasks.map((x) => (x.id === t.id ? t : x)) : [...prev.tasks, t] };
+      return { ...prev, tasks: exists ? prev.tasks.map((x) => (x.id === t.id ? t : x)) : [...prev.tasks, t] };
     });
     setShowTaskModal(false); setEditingTask(null);
   };
 
   const handleDelete = () => {
     if (!deleteTarget) return;
-    update((prev) => ({ tasks: prev.tasks.filter((t) => t.id !== deleteTarget) }));
+    update((prev) => ({ ...prev, tasks: prev.tasks.filter((t) => t.id !== deleteTarget) }));
     setDeleteTarget(null);
   };
 
@@ -487,12 +597,12 @@ export default function TasksBoard() {
       while (j >= 0 && j < arr.length && arr[j].status === "done") j += dir;
       if (j < 0 || j >= arr.length) return prev;
       [arr[i], arr[j]] = [arr[j], arr[i]];
-      return { tasks: arr };
+      return { ...prev, tasks: arr };
     });
   };
 
   const patch = (id: string, fields: Partial<Task>) =>
-    update((prev) => ({ tasks: prev.tasks.map((t) => (t.id === id ? { ...t, ...fields, updatedAt: new Date().toISOString() } : t)) }));
+    update((prev) => ({ ...prev, tasks: prev.tasks.map((t) => (t.id === id ? { ...t, ...fields, updatedAt: new Date().toISOString() } : t)) }));
 
   const handleSetStatus = (id: string, status: Status) => patch(id, { status });
   const handleSetUrgency = (id: string, urgency: Urgency) => patch(id, { urgency });
@@ -503,16 +613,32 @@ export default function TasksBoard() {
   const handleAddNote = (text: string) => {
     if (!noteTarget || role === "viewer") return;
     const note: TaskNote = { id: generateId(), text, author: role, createdAt: new Date().toISOString() };
-    update((prev) => ({ tasks: prev.tasks.map((t) => (t.id === noteTarget ? { ...t, notes: [...t.notes, note], updatedAt: new Date().toISOString() } : t)) }));
+    update((prev) => ({ ...prev, tasks: prev.tasks.map((t) => (t.id === noteTarget ? { ...t, notes: [...t.notes, note], updatedAt: new Date().toISOString() } : t)) }));
     setNoteTarget(null);
   };
 
   const handleDeleteNote = (taskId: string, noteId: string) => {
-    update((prev) => ({ tasks: prev.tasks.map((t) => (t.id === taskId ? { ...t, notes: t.notes.filter((n) => n.id !== noteId) } : t)) }));
+    update((prev) => ({ ...prev, tasks: prev.tasks.map((t) => (t.id === taskId ? { ...t, notes: t.notes.filter((n) => n.id !== noteId) } : t)) }));
+  };
+
+  const handleSaveCredential = (c: Credential) => {
+    update((prev) => {
+      const list = prev.credentials ?? [];
+      const exists = list.some((x) => x.id === c.id);
+      return { ...prev, credentials: exists ? list.map((x) => (x.id === c.id ? c : x)) : [...list, c] };
+    });
+    setShowCredModal(false); setEditingCred(null);
+  };
+
+  const handleDeleteCredential = () => {
+    if (!deleteCredTarget) return;
+    update((prev) => ({ ...prev, credentials: (prev.credentials ?? []).filter((c) => c.id !== deleteCredTarget) }));
+    setDeleteCredTarget(null);
   };
 
   const activeTasks = useMemo(() => data.tasks.filter((t) => t.status !== "done"), [data]);
   const doneTasks = useMemo(() => data.tasks.filter((t) => t.status === "done"), [data]);
+  const credentials = data.credentials ?? [];
   const stats = useMemo(() => {
     const total = data.tasks.length;
     const done = doneTasks.length;
@@ -523,9 +649,10 @@ export default function TasksBoard() {
 
   if (!loaded) return <div className="min-h-screen bg-background" />;
 
-  const shown = tab === "active" ? activeTasks : doneTasks;
-  const tabBtn = (t: "active" | "done") =>
-    `px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${tab === t ? "bg-accent text-white" : "text-text-secondary hover:text-heading hover:bg-border/40"}`;
+  const effTab = tab === "creds" && !canManage ? "active" : tab;
+  const shown = effTab === "done" ? doneTasks : activeTasks;
+  const tabBtn = (t: "active" | "done" | "creds") =>
+    `px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${effTab === t ? "bg-accent text-white" : "text-text-secondary hover:text-heading hover:bg-border/40"}`;
 
   const cardHandlers = {
     onMove: handleMove, onSetStatus: handleSetStatus, onSetUrgency: handleSetUrgency,
@@ -547,7 +674,7 @@ export default function TasksBoard() {
           <button onClick={toggleTheme} className="p-2 rounded-lg border border-border-hover text-text-secondary hover:text-heading hover:border-text-muted transition-colors" title={theme === "dark" ? "Светлая тема" : "Тёмная тема"}>
             {theme === "dark" ? <SunIcon /> : <MoonIcon />}
           </button>
-          {canFull && (
+          {canFull && effTab !== "creds" && (
             <button onClick={() => { setEditingTask(null); setShowTaskModal(true); }}
               className="px-3 sm:px-4 py-2 rounded-lg bg-accent hover:bg-accent-hover text-white text-xs sm:text-sm font-medium transition-colors">+ Задача</button>
           )}
@@ -572,15 +699,37 @@ export default function TasksBoard() {
         </div>
 
         {/* Tabs */}
-        <div className="flex items-center gap-2 mb-5">
+        <div className="flex items-center gap-2 mb-5 flex-wrap">
           <button onClick={() => setTab("active")} className={tabBtn("active")}>📋 Активные ({activeTasks.length})</button>
           <button onClick={() => setTab("done")} className={tabBtn("done")}>✅ Сделано ({doneTasks.length})</button>
+          {canManage && <button onClick={() => setTab("creds")} className={tabBtn("creds")}>🔑 Пароли ({credentials.length})</button>}
         </div>
 
-        {shown.length === 0 ? (
+        {effTab === "creds" ? (
+          <>
+            {canFull && (
+              <button onClick={() => { setEditingCred(null); setShowCredModal(true); }}
+                className="mb-4 px-3 sm:px-4 py-2 rounded-lg bg-accent hover:bg-accent-hover text-white text-xs sm:text-sm font-medium transition-colors">+ Платформа</button>
+            )}
+            {credentials.length === 0 ? (
+              <div className="bg-card border border-border rounded-2xl py-16 text-center">
+                <p className="text-text-secondary text-base mb-2">Платформ пока нет</p>
+                {canFull && <button onClick={() => { setEditingCred(null); setShowCredModal(true); }} className="text-accent hover:text-blue-300 text-sm">Добавить платформу</button>}
+              </div>
+            ) : (
+              <div className="bg-card border border-border rounded-2xl p-2 sm:p-3 space-y-1">
+                {credentials.map((c) => (
+                  <CredentialCard key={c.id} credential={c} canFull={canFull}
+                    onEdit={(cr) => { setEditingCred(cr); setShowCredModal(true); }}
+                    onDelete={(id) => setDeleteCredTarget(id)} />
+                ))}
+              </div>
+            )}
+          </>
+        ) : shown.length === 0 ? (
           <div className="bg-card border border-border rounded-2xl py-16 text-center">
-            <p className="text-text-secondary text-base mb-2">{tab === "active" ? "Активных задач нет" : "Сделанных задач пока нет"}</p>
-            {tab === "active" && canFull && (
+            <p className="text-text-secondary text-base mb-2">{effTab === "active" ? "Активных задач нет" : "Сделанных задач пока нет"}</p>
+            {effTab === "active" && canFull && (
               <button onClick={() => { setEditingTask(null); setShowTaskModal(true); }} className="text-accent hover:text-blue-300 text-sm">Создать задачу</button>
             )}
           </div>
@@ -598,6 +747,8 @@ export default function TasksBoard() {
       {showTaskModal && canFull && <TaskModal task={editingTask} onSave={handleSaveTask} onClose={() => { setShowTaskModal(false); setEditingTask(null); }} />}
       {noteTarget && canManage && <NoteModal onSave={handleAddNote} onClose={() => setNoteTarget(null)} />}
       {deleteTarget && <ConfirmModal message="Удалить эту задачу?" onConfirm={handleDelete} onCancel={() => setDeleteTarget(null)} />}
+      {showCredModal && canFull && <CredentialModal credential={editingCred} onSave={handleSaveCredential} onClose={() => { setShowCredModal(false); setEditingCred(null); }} />}
+      {deleteCredTarget && <ConfirmModal message="Удалить эту платформу?" onConfirm={handleDeleteCredential} onCancel={() => setDeleteCredTarget(null)} />}
     </div>
   );
 }
