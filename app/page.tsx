@@ -35,7 +35,7 @@ const URGENCY_LIST: Urgency[] = ["critical", "high", "medium", "low"];
 const ROLE_LABEL: Record<Role, string> = { viewer: "", alexey: "🧑‍💼 Alexey", kateryna: "👑 Kateryna" };
 const QUICK_EMOJIS = ["📌", "🚀", "🛠️", "🐛", "💡", "📞", "📧", "🔗", "🎨", "📊", "🤖", "💬", "🌐", "🧩", "💳", "🧂", "⚡", "🔥"];
 const COLORS = ["#3b82f6", "#ef4444", "#f59e0b", "#10b981", "#8b5cf6", "#ec4899", "#14b8a6", "#64748b"];
-const DEFAULT_ACCENT = "#3b82f6";
+const DEFAULT_ACCENT = "#818cf8";
 
 /* ------------------------------------------------------------------ */
 /*  Icons                                                              */
@@ -82,9 +82,9 @@ function CopyButton({ value, label }: { value: string; label: string }) {
 /* ------------------------------------------------------------------ */
 function StatCard({ value, label }: { value: string | number; label: string }) {
   return (
-    <div className="bg-card border border-border rounded-xl p-4 sm:p-5 flex flex-col items-center justify-center transition-smooth hover:border-border-hover">
-      <div className="text-2xl sm:text-3xl font-bold text-heading stat-number">{value}</div>
-      <div className="text-xs sm:text-sm text-text-secondary mt-1 text-center">{label}</div>
+    <div className="bg-card border border-border rounded-2xl card-soft p-4 sm:p-5 flex flex-col items-center justify-center transition-smooth hover:border-border-hover hover:-translate-y-0.5 card-soft">
+      <div className="text-2xl sm:text-3xl font-extrabold stat-number gradient-text">{value}</div>
+      <div className="text-[10px] sm:text-xs text-text-muted mt-1.5 text-center uppercase tracking-wider font-semibold">{label}</div>
     </div>
   );
 }
@@ -103,14 +103,14 @@ function LoginModal({ onLogin, onClose }: { onLogin: (role: Role) => void; onClo
   };
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-card border border-border rounded-2xl p-6 sm:p-8 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-card border border-border rounded-2xl card-soft p-6 sm:p-8 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
         <h2 className="text-xl font-bold text-heading mb-2 text-center">Вход</h2>
         <p className="text-xs text-text-muted text-center mb-6">Введи логин, чтобы редактировать. Без логина — только просмотр.</p>
         <form onSubmit={submit}>
           <input type="password" value={code} onChange={(e) => setCode(e.target.value)} placeholder="Логин / код" autoFocus
             className={`w-full px-4 py-3 rounded-lg bg-input-bg border text-foreground placeholder-muted outline-none transition-colors ${error ? "border-red-500" : "border-border-hover focus:border-accent"}`} />
           {error && <p className="text-red-400 text-sm mt-2">Неверный логин</p>}
-          <button type="submit" className="w-full mt-4 py-3 rounded-lg bg-accent hover:bg-accent-hover text-white font-medium transition-colors">Войти</button>
+          <button type="submit" className="w-full mt-4 py-3 rounded-lg btn-grad text-white font-medium transition-colors">Войти</button>
         </form>
       </div>
     </div>
@@ -157,7 +157,7 @@ function TaskModal({ task, onSave, onClose }: {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-card border border-border rounded-2xl card-soft p-5 sm:p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         <h2 className="text-lg font-bold text-heading mb-5">{isEdit ? "Редактировать задачу" : "Новая задача"}</h2>
 
         <label className="block text-xs text-text-secondary mb-1 font-medium">Эмодзи + название</label>
@@ -229,7 +229,7 @@ function TaskModal({ task, onSave, onClose }: {
 
         <div className="flex gap-3 justify-end">
           <button onClick={onClose} className="px-4 py-2 rounded-lg text-text-secondary hover:text-heading transition-colors text-sm">Отменить</button>
-          <button onClick={handleSave} className="px-5 py-2 rounded-lg bg-accent hover:bg-accent-hover text-white font-medium transition-colors text-sm">{isEdit ? "Сохранить" : "Создать"}</button>
+          <button onClick={handleSave} className="px-5 py-2 rounded-lg btn-grad text-white font-medium transition-colors text-sm">{isEdit ? "Сохранить" : "Создать"}</button>
         </div>
       </div>
     </div>
@@ -243,7 +243,7 @@ function NoteModal({ onSave, onClose }: { onSave: (text: string) => void; onClos
   const [text, setText] = useState("");
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-card border border-border rounded-2xl card-soft p-5 sm:p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
         <h2 className="text-lg font-bold text-heading mb-4">Добавить заметку</h2>
         <textarea value={text} onChange={(e) => setText(e.target.value)}
           className="w-full px-3 py-2.5 rounded-lg bg-input-bg border border-border-hover text-foreground placeholder-muted outline-none focus:border-accent transition-colors text-sm min-h-[90px] resize-y"
@@ -251,7 +251,7 @@ function NoteModal({ onSave, onClose }: { onSave: (text: string) => void; onClos
         <div className="flex gap-3 justify-end mt-4">
           <button onClick={onClose} className="px-4 py-2 rounded-lg text-text-secondary hover:text-heading transition-colors text-sm">Отменить</button>
           <button onClick={() => { if (text.trim()) onSave(text.trim()); }}
-            className="px-4 py-2 rounded-lg bg-accent hover:bg-accent-hover text-white font-medium transition-colors text-sm">Добавить</button>
+            className="px-4 py-2 rounded-lg btn-grad text-white font-medium transition-colors text-sm">Добавить</button>
         </div>
       </div>
     </div>
@@ -264,7 +264,7 @@ function NoteModal({ onSave, onClose }: { onSave: (text: string) => void; onClos
 function ConfirmModal({ message, onConfirm, onCancel }: { message: string; onConfirm: () => void; onCancel: () => void }) {
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={onCancel}>
-      <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-card border border-border rounded-2xl card-soft p-5 sm:p-6 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
         <p className="text-heading text-sm mb-5">{message}</p>
         <div className="flex gap-3 justify-end">
           <button onClick={onCancel} className="px-4 py-2 rounded-lg text-text-secondary hover:text-heading transition-colors text-sm">Отменить</button>
@@ -294,7 +294,7 @@ function CredentialModal({ credential, onSave, onClose }: {
   };
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-card border border-border rounded-2xl card-soft p-5 sm:p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         <h2 className="text-lg font-bold text-heading mb-5">{isEdit ? "Редактировать платформу" : "Новая платформа"}</h2>
         <label className="block text-xs text-text-secondary mb-1 font-medium">Название</label>
         <input value={name} onChange={(e) => setName(e.target.value)} className={`${ic} mb-3`} placeholder="Название платформы" autoFocus />
@@ -314,7 +314,7 @@ function CredentialModal({ credential, onSave, onClose }: {
         </div>
         <div className="flex gap-3 justify-end">
           <button onClick={onClose} className="px-4 py-2 rounded-lg text-text-secondary hover:text-heading transition-colors text-sm">Отменить</button>
-          <button onClick={handleSave} className="px-5 py-2 rounded-lg bg-accent hover:bg-accent-hover text-white font-medium transition-colors text-sm">{isEdit ? "Сохранить" : "Создать"}</button>
+          <button onClick={handleSave} className="px-5 py-2 rounded-lg btn-grad text-white font-medium transition-colors text-sm">{isEdit ? "Сохранить" : "Создать"}</button>
         </div>
       </div>
     </div>
@@ -419,10 +419,11 @@ function TaskCard({ task, index, role, isFirst, isLast, onMove, onSetStatus, onS
           </div>
           {/* Progress bar */}
           <div className="flex items-center gap-2 mt-2">
-            <div className="flex-1 h-1.5 rounded-full bg-border/50 overflow-hidden">
-              <div className="h-full rounded-full transition-all duration-500" style={{ width: `${task.progress}%`, backgroundColor: isDone ? "#9ca3af" : accent }} />
+            <div className="flex-1 h-2 rounded-full bg-border/60 overflow-hidden">
+              <div className={`h-full rounded-full transition-all duration-500 ${!isDone && !task.color ? "grad-bar" : ""}`}
+                style={{ width: `${task.progress}%`, backgroundColor: isDone ? "#9ca3af" : (task.color || undefined) }} />
             </div>
-            <span className="text-[11px] text-text-muted font-semibold shrink-0">{task.progress}%</span>
+            <span className="text-[11px] text-text-muted font-semibold shrink-0 tabular-nums">{task.progress}%</span>
           </div>
         </div>
         <button onClick={() => setOpen(!open)} aria-label={open ? "Свернуть" : "Открыть"}
@@ -674,7 +675,7 @@ export default function TasksBoard() {
     <div className="min-h-screen bg-background transition-colors duration-300">
       <header className="max-w-3xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8 pb-2 flex items-start justify-between">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-heading">{"Kate's Tasks"}</h1>
+          <h1 className="text-xl sm:text-3xl font-extrabold gradient-text tracking-tight whitespace-nowrap">{"Kate's Tasks"}</h1>
           <p className="text-text-muted text-xs sm:text-sm mt-0.5">Список задач</p>
         </div>
         <div className="flex items-center gap-2 sm:gap-2.5">
@@ -684,7 +685,7 @@ export default function TasksBoard() {
           </button>
           {canFull && effTab !== "creds" && (
             <button onClick={() => { setEditingTask(null); setShowTaskModal(true); }}
-              className="px-3 sm:px-4 py-2 rounded-lg bg-accent hover:bg-accent-hover text-white text-xs sm:text-sm font-medium transition-colors">+ Задача</button>
+              className="px-3 sm:px-4 py-2 rounded-lg btn-grad text-white text-xs sm:text-sm font-medium transition-colors">+ Задача</button>
           )}
           <button onClick={() => role !== "viewer" ? doLogout() : setShowLogin(true)}
             className="px-3 sm:px-4 py-2 rounded-lg border border-border-hover text-text-secondary hover:text-heading hover:border-text-muted text-xs sm:text-sm transition-colors">
@@ -709,7 +710,7 @@ export default function TasksBoard() {
         {/* Section menu */}
         <div className="relative mb-5 inline-block">
           <button onClick={() => setMenuOpen((o) => !o)}
-            className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg bg-card border border-border-hover text-heading text-sm font-medium hover:border-text-muted transition-colors">
+            className="flex items-center gap-2 px-3 sm:px-4 py-2.5 rounded-xl bg-card border border-border-hover text-heading text-sm font-semibold hover:border-text-muted card-soft transition-smooth">
             <MenuIcon />
             <span>{currentSection.label}</span>
             <ChevronDown className={`w-4 h-4 text-text-muted transition-transform ${menuOpen ? "rotate-180" : ""}`} />
@@ -717,7 +718,7 @@ export default function TasksBoard() {
           {menuOpen && (
             <>
               <div className="fixed inset-0 z-30" onClick={() => setMenuOpen(false)} />
-              <div className="absolute left-0 mt-1 z-40 w-60 bg-card border border-border rounded-xl shadow-lg p-1.5">
+              <div className="absolute left-0 mt-2 z-40 w-60 bg-card border border-border rounded-xl card-soft pop-in p-1.5">
                 {menuItems.map((it) => (
                   <button key={it.key} onClick={() => { setTab(it.key); setMenuOpen(false); }}
                     className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${effTab === it.key ? "bg-accent text-white" : "text-text-secondary hover:bg-border/40 hover:text-heading"}`}>
@@ -733,15 +734,15 @@ export default function TasksBoard() {
           <>
             {canFull && (
               <button onClick={() => { setEditingCred(null); setShowCredModal(true); }}
-                className="mb-4 px-3 sm:px-4 py-2 rounded-lg bg-accent hover:bg-accent-hover text-white text-xs sm:text-sm font-medium transition-colors">+ Платформа</button>
+                className="mb-4 px-3 sm:px-4 py-2 rounded-lg btn-grad text-white text-xs sm:text-sm font-medium transition-colors">+ Платформа</button>
             )}
             {credentials.length === 0 ? (
-              <div className="bg-card border border-border rounded-2xl py-16 text-center">
+              <div className="bg-card border border-border rounded-2xl card-soft py-16 text-center">
                 <p className="text-text-secondary text-base mb-2">Платформ пока нет</p>
                 {canFull && <button onClick={() => { setEditingCred(null); setShowCredModal(true); }} className="text-accent hover:text-blue-300 text-sm">Добавить платформу</button>}
               </div>
             ) : (
-              <div className="bg-card border border-border rounded-2xl p-2 sm:p-3 space-y-1">
+              <div className="bg-card border border-border rounded-2xl card-soft p-2 sm:p-3 space-y-1">
                 {credentials.map((c) => (
                   <CredentialCard key={c.id} credential={c} canFull={canFull}
                     onEdit={(cr) => { setEditingCred(cr); setShowCredModal(true); }}
@@ -751,14 +752,14 @@ export default function TasksBoard() {
             )}
           </>
         ) : shown.length === 0 ? (
-          <div className="bg-card border border-border rounded-2xl py-16 text-center">
+          <div className="bg-card border border-border rounded-2xl card-soft py-16 text-center">
             <p className="text-text-secondary text-base mb-2">{effTab === "active" ? "Активных задач нет" : "Сделанных задач пока нет"}</p>
             {effTab === "active" && canFull && (
               <button onClick={() => { setEditingTask(null); setShowTaskModal(true); }} className="text-accent hover:text-blue-300 text-sm">Создать задачу</button>
             )}
           </div>
         ) : (
-          <div className="bg-card border border-border rounded-2xl p-2 sm:p-3 space-y-1">
+          <div className="bg-card border border-border rounded-2xl card-soft p-2 sm:p-3 space-y-1">
             {shown.map((t, i) => (
               <TaskCard key={t.id} task={t} index={i + 1} role={role}
                 isFirst={i === 0} isLast={i === shown.length - 1} {...cardHandlers} />
