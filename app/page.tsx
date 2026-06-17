@@ -61,6 +61,9 @@ function SunIcon() {
 function MoonIcon() {
   return <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" /></svg>;
 }
+function MenuIcon() {
+  return <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>;
+}
 function CopyButton({ value, label }: { value: string; label: string }) {
   const [copied, setCopied] = useState(false);
   return (
@@ -550,7 +553,8 @@ export default function TasksBoard() {
   const [showCredModal, setShowCredModal] = useState(false);
   const [editingCred, setEditingCred] = useState<Credential | null>(null);
   const [deleteCredTarget, setDeleteCredTarget] = useState<string | null>(null);
-  const [theme, setTheme] = useState<"dark" | "light">("light");
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [menuOpen, setMenuOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -651,8 +655,12 @@ export default function TasksBoard() {
 
   const effTab = tab === "creds" && !canManage ? "active" : tab;
   const shown = effTab === "done" ? doneTasks : activeTasks;
-  const tabBtn = (t: "active" | "done" | "creds") =>
-    `px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors ${effTab === t ? "bg-accent text-white" : "text-text-secondary hover:text-heading hover:bg-border/40"}`;
+  const menuItems: { key: "active" | "done" | "creds"; label: string }[] = [
+    { key: "active", label: `📋 Активные (${activeTasks.length})` },
+    { key: "done", label: `✅ Сделано (${doneTasks.length})` },
+    ...(canManage ? [{ key: "creds" as const, label: `🔑 Платформы (${credentials.length})` }] : []),
+  ];
+  const currentSection = menuItems.find((i) => i.key === effTab) ?? menuItems[0];
 
   const cardHandlers = {
     onMove: handleMove, onSetStatus: handleSetStatus, onSetUrgency: handleSetUrgency,
@@ -698,11 +706,27 @@ export default function TasksBoard() {
           <StatCard value={`${stats.pct}%`} label="Выполнено" />
         </div>
 
-        {/* Tabs */}
-        <div className="flex items-center gap-2 mb-5 flex-wrap">
-          <button onClick={() => setTab("active")} className={tabBtn("active")}>📋 Активные ({activeTasks.length})</button>
-          <button onClick={() => setTab("done")} className={tabBtn("done")}>✅ Сделано ({doneTasks.length})</button>
-          {canManage && <button onClick={() => setTab("creds")} className={tabBtn("creds")}>🔑 Пароли ({credentials.length})</button>}
+        {/* Section menu */}
+        <div className="relative mb-5 inline-block">
+          <button onClick={() => setMenuOpen((o) => !o)}
+            className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg bg-card border border-border-hover text-heading text-sm font-medium hover:border-text-muted transition-colors">
+            <MenuIcon />
+            <span>{currentSection.label}</span>
+            <ChevronDown className={`w-4 h-4 text-text-muted transition-transform ${menuOpen ? "rotate-180" : ""}`} />
+          </button>
+          {menuOpen && (
+            <>
+              <div className="fixed inset-0 z-30" onClick={() => setMenuOpen(false)} />
+              <div className="absolute left-0 mt-1 z-40 w-60 bg-card border border-border rounded-xl shadow-lg p-1.5">
+                {menuItems.map((it) => (
+                  <button key={it.key} onClick={() => { setTab(it.key); setMenuOpen(false); }}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${effTab === it.key ? "bg-accent text-white" : "text-text-secondary hover:bg-border/40 hover:text-heading"}`}>
+                    {it.label}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
         {effTab === "creds" ? (

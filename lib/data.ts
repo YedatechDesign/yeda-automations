@@ -256,8 +256,8 @@ export function saveData(data: TasksData) {
 }
 
 export function loadTheme(): "dark" | "light" {
-  if (typeof window === "undefined") return "light";
-  return (localStorage.getItem(THEME_KEY) as "dark" | "light") || "light";
+  if (typeof window === "undefined") return "dark";
+  return (localStorage.getItem(THEME_KEY) as "dark" | "light") || "dark";
 }
 
 export function saveTheme(t: "dark" | "light") {
